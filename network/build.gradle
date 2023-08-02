@@ -8,5 +8,9 @@ android {
 }
 
 dependencies {
+    implementation libs.io.ktor.client.android
+    implementation libs.io.ktor.client.serialization
+    implementation libs.io.ktor.client.logging
+
     testImplementation libs.junit
 }
