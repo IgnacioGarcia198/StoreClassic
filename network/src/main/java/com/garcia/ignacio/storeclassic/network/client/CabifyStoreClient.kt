@@ -33,6 +33,7 @@ class CabifyStoreClient: StoreClient {
     }
 
     private fun createHttpClient() = HttpClient(Android) {
+        expectSuccess = true
 
         install(ContentNegotiation) {
             json(
