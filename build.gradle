@@ -1,0 +1,76 @@
+import com.android.build.gradle.BasePlugin
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.dsl.KotlinCompile
+
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.android.library) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.jvm) apply false
+}
+
+ext {
+    versions = [
+            'androidxCore' : '1.8.0',
+            'appcompat' : '1.6.1',
+            'material' : '1.9.0',
+
+            'junit' : '4.13.2',
+            'androidxJunit' : '1.1.5',
+            'espresso' : '3.5.1',
+    ]
+}
+
+def javaVersion = JavaVersion.VERSION_11
+def jvmTargetVersion = JvmTarget.JVM_11
+
+allprojects {
+
+    plugins.withType(BasePlugin).configureEach {
+        project.android {
+            compileSdk 33
+
+            defaultConfig {
+                minSdk 21
+                targetSdk 33
+
+                vectorDrawables.useSupportLibrary = true
+                testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+            }
+
+            compileOptions {
+                sourceCompatibility javaVersion
+                targetCompatibility javaVersion
+            }
+
+            testOptions {
+                unitTests {
+                    includeAndroidResources = true
+                }
+            }
+        }
+    }
+
+    plugins.withType(JavaPlugin).configureEach {
+        project.java {
+            sourceCompatibility = javaVersion
+            targetCompatibility = javaVersion
+        }
+    }
+
+    tasks.withType(Test).configureEach {
+        testLogging {
+            exceptionFormat "full"
+            showCauses true
+            showExceptions true
+            showStackTraces true
+        }
+    }
+
+    tasks.withType(KotlinCompile).configureEach {
+        compilerOptions {
+            jvmTarget = jvmTargetVersion
+        }
+    }
+}
