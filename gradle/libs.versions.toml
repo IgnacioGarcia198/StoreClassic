@@ -5,6 +5,7 @@
 androidGradlePlugin = "8.0.2"
 kotlin = "1.8.20"
 hilt = "2.44"
+dagger = "2.47"
 
 androidxCore = "1.8.0"
 androidxAppCompat = "1.6.1"
@@ -39,6 +40,8 @@ io-ktor-client-serialization = { module = "io.ktor:ktor-client-serialization", v
 io-ktor-client-logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 dagger-hilt-android = { module = "com.google.dagger:hilt-android", version.ref = "hilt" }
 dagger-hilt-compiler = { module = "com.google.dagger:hilt-compiler", version.ref = "hilt" }
+dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
+dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 
 junit = { module = "junit:junit", version.ref = "junit" }
 androidx-test-ext-junit = { module = "androidx.test.ext:junit", version.ref =  "androidTestExtJunit"}
