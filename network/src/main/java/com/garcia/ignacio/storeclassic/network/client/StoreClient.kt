@@ -1,8 +1,8 @@
 package com.garcia.ignacio.storeclassic.network.client
 
-import com.garcia.ignacio.storeclassic.network.models.NetworkProduct
+import com.garcia.ignacio.domain.models.Product
 import kotlinx.coroutines.flow.Flow
 
 interface StoreClient {
-    suspend fun getProducts(): Flow<List<NetworkProduct>>
+    suspend fun getProducts(): Flow<List<Product>>
 }

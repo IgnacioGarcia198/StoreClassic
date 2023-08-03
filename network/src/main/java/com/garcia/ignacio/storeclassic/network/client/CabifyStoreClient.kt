@@ -1,7 +1,7 @@
 package com.garcia.ignacio.storeclassic.network.client
 
 import android.util.Log
-import com.garcia.ignacio.storeclassic.network.models.NetworkProduct
+import com.garcia.ignacio.domain.models.Product
 import com.garcia.ignacio.storeclassic.network.models.ProductsResponse
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -30,8 +30,8 @@ class CabifyStoreClient: StoreClient {
         createHttpClient()
     }
 
-    override suspend fun getProducts(): Flow<List<NetworkProduct>> = flowOf(
-        httpClient.get(PRODUCTS_ENDPOINT).body<ProductsResponse>().products
+    override suspend fun getProducts(): Flow<List<Product>> = flowOf(
+        httpClient.get(PRODUCTS_ENDPOINT).body<ProductsResponse>().products.map { it.toDomain() }
     )
 
     private fun createHttpClient() = HttpClient(Android) {
