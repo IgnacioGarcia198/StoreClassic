@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.di
+package com.garcia.ignacio.storeclassic.network.di
 
 import com.garcia.ignacio.storeclassic.network.client.CabifyStoreClient
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
