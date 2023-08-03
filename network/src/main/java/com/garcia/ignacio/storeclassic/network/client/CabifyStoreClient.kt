@@ -1,7 +1,7 @@
 package com.garcia.ignacio.storeclassic.network.client
 
 import android.util.Log
-import com.garcia.ignacio.data.remote.StoreClient
+import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.domain.models.Product
 import com.garcia.ignacio.storeclassic.network.models.ProductsResponse
 import io.ktor.client.HttpClient
