@@ -1,6 +1,6 @@
 package com.garcia.ignacio.storeclassic.db
 
-import com.garcia.ignacio.domain.models.Product
+import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.db.dao.ProductDao
 import com.garcia.ignacio.storeclassic.db.models.toDbProduct

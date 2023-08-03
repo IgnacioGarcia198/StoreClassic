@@ -2,7 +2,7 @@ package com.garcia.ignacio.storeclassic.db.models
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.garcia.ignacio.domain.models.Product
+import com.garcia.ignacio.storeclassic.domain.models.Product
 
 private const val PRODUCTS_TABLE_NAME = "products"
 

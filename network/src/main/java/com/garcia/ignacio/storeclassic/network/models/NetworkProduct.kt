@@ -1,6 +1,6 @@
 package com.garcia.ignacio.storeclassic.network.models
 
-import com.garcia.ignacio.domain.models.Product
+import com.garcia.ignacio.storeclassic.domain.models.Product
 import kotlinx.serialization.Serializable
 
 @Serializable

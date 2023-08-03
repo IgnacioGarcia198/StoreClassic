@@ -1,6 +1,6 @@
 package com.garcia.ignacio.storeclassic.data.local
 
-import com.garcia.ignacio.domain.models.Product
+import com.garcia.ignacio.storeclassic.domain.models.Product
 import kotlinx.coroutines.flow.Flow
 
 interface ProductsLocalDataStore {
