@@ -27,7 +27,8 @@ android {
 
 dependencies {
     implementation project(":network")
-    implementation project(':db')
+    implementation project(":db")
+    implementation project(":data")
     implementation libs.androidx.core
     implementation libs.androidx.appcompat
     implementation libs.android.material
