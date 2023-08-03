@@ -17,6 +17,8 @@ import io.ktor.client.request.header
 import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.serialization.kotlinx.json.json
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.Json
 
 private const val PRODUCTS_ENDPOINT =
@@ -28,9 +30,9 @@ class CabifyStoreClient: StoreClient {
         createHttpClient()
     }
 
-    override suspend fun getProducts(): Result<List<NetworkProduct>> = kotlin.runCatching {
+    override suspend fun getProducts(): Flow<List<NetworkProduct>> = flowOf(
         httpClient.get(PRODUCTS_ENDPOINT).body<ProductsResponse>().products
-    }
+    )
 
     private fun createHttpClient() = HttpClient(Android) {
         expectSuccess = true
