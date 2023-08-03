@@ -20,12 +20,13 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.serialization.json.Json
+import javax.inject.Inject
 
 private const val PRODUCTS_ENDPOINT =
     "https://gist.githubusercontent.com/palcalde/6c19259bd32dd6aafa327fa557859c2f/raw/ba51779474a150ee4367cda4f4ffacdcca479887/Products.json"
 private const val TIMEOUT = 60_000
 
-class CabifyStoreClient: StoreClient {
+class CabifyStoreClient @Inject constructor(): StoreClient {
     private val httpClient: HttpClient by lazy {
         createHttpClient()
     }
