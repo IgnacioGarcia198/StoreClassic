@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.network.client
+package com.garcia.ignacio.data.remote
 
 import com.garcia.ignacio.domain.models.Product
 import kotlinx.coroutines.flow.Flow

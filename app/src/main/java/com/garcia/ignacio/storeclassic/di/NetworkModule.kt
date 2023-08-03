@@ -1,7 +1,7 @@
 package com.garcia.ignacio.storeclassic.di
 
 import com.garcia.ignacio.storeclassic.network.client.CabifyStoreClient
-import com.garcia.ignacio.storeclassic.network.client.StoreClient
+import com.garcia.ignacio.data.remote.StoreClient
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
