@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic
+package com.garcia.ignacio.storeclassic.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.navigation.fragment.findNavController
+import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.FragmentSecondBinding
 
 /**

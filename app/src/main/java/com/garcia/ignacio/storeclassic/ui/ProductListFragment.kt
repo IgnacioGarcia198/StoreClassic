@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic
+package com.garcia.ignacio.storeclassic.ui
 
 import android.os.Bundle
 import android.view.LayoutInflater
