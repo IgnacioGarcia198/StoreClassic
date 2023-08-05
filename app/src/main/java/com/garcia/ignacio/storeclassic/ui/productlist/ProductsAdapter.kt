@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui
+package com.garcia.ignacio.storeclassic.ui.productlist
 
 import android.view.LayoutInflater
 import android.view.View
@@ -12,6 +12,7 @@ import androidx.recyclerview.widget.RecyclerView
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.ProductListItemBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import java.text.DecimalFormat
 import javax.inject.Inject
 

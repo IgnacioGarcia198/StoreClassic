@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui
+package com.garcia.ignacio.storeclassic.ui.productlist
 
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -7,6 +7,7 @@ import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
+import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
