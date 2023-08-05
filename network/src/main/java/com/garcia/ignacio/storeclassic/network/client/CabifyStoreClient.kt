@@ -8,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.get
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
 private const val PRODUCTS_ENDPOINT =
@@ -20,7 +21,8 @@ class CabifyStoreClient @Inject constructor(
         clientFactory.createStoreHttpClient()
     }
 
-    override suspend fun getProducts(): Flow<List<Product>> = flowOf(
-        httpClient.get(PRODUCTS_ENDPOINT).body<ProductsResponse>().products.map { it.toDomain() }
+    override fun getProducts(): Flow<List<Product>> = flowOf(
+        runBlocking { httpClient.get(PRODUCTS_ENDPOINT).body<ProductsResponse>() }
+            .products.map { it.toDomain() }
     )
 }
