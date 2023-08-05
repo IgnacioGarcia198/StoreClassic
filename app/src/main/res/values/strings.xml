@@ -1,11 +1,12 @@
 <resources>
     <string name="app_name">Cabify Store</string>
-    <!-- Strings used for fragments for navigation -->
+    <!-- Store Product List -->
     <string name="product_list_fragment_label">Store Product list</string>
+    <string name="see_discounts">See discounts</string>
+    <string name="euro_currency_format" translatable="false">%s €</string>
 
 
 
     <string name="second_fragment_label">Second Fragment</string>
     <string name="previous">Previous</string>
-    <string name="see_discounts">See discounts</string>
 </resources>

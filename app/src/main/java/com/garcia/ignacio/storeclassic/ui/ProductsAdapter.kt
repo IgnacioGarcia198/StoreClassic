@@ -5,9 +5,13 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
+import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.ProductListItemBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import java.text.DecimalFormat
 import javax.inject.Inject
+
+private const val PRICE_FORMAT = "0.#"
 
 class ProductsAdapter @Inject constructor() :
     ListAdapter<Product, ProductsAdapter.ProductViewHolder>(ProductDiffCallback()) {
@@ -15,9 +19,12 @@ class ProductsAdapter @Inject constructor() :
     class ProductViewHolder(
         private val binding: ProductListItemBinding
     ) : RecyclerView.ViewHolder(binding.root) {
+        private val priceFormatter = DecimalFormat(PRICE_FORMAT)
         fun bind(product: Product) {
             binding.productName.text = product.name
-            binding.productPrice.text = product.price.toString()
+            binding.productPrice.text = itemView.context.getString(
+                R.string.euro_currency_format, priceFormatter.format(product.price)
+            )
         }
     }
 
