@@ -5,6 +5,7 @@
     <string name="see_discounts">See discounts</string>
     <string name="euro_currency_format" translatable="false">%s €</string>
     <string name="retrieving_products">Retrieving products…</string>
+    <string name="no_products_available">No products available.</string>
 
 
 

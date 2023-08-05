@@ -56,6 +56,7 @@ class ProductListFragment : Fragment() {
             is StoreViewModel.State.Ready -> {
                 hideLoading()
                 productsAdapter.submitList(state.products)
+                binding.noProductsText.isVisible = state.products.isEmpty()
             }
         }
     }
