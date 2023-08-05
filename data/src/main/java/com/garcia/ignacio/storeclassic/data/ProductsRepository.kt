@@ -4,12 +4,14 @@ import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -38,5 +40,5 @@ class ProductsRepository @Inject constructor(
     val products: Flow<ResultList<List<Product>>> =
         productsFlow.combine(errorStateFlow) { list, errors ->
             ResultList(list, errors)
-        }
+        }.flowOn(Dispatchers.IO)
 }
