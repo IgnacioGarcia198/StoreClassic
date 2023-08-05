@@ -30,6 +30,7 @@ class ProductViewHolder(
 
     fun bind(product: Product) {
         binding.seeDiscounts.setOnClickListener { println("discounts clicked") }
+        binding.addToCart.setSelection(binding.addToCart.selectedItemPosition, false)
         binding.addToCart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(
                 parent: AdapterView<*>?,
