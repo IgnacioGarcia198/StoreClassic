@@ -8,14 +8,17 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class ProductListFragment : Fragment() {
 
     private var _binding: FragmentProductListBinding? = null
+    private val binding get() = _binding!!
     private val viewModel: StoreViewModel by viewModels()
 
-    private val binding get() = _binding!!
+    @Inject
+    lateinit var productsAdapter: ProductsAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -23,12 +26,22 @@ class ProductListFragment : Fragment() {
     ): View {
         _binding = FragmentProductListBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        viewModel
+        initializeRecyclerView()
+        observeViewModel()
+    }
+
+    private fun observeViewModel() {
+        viewModel.getProducts().observe(viewLifecycleOwner) {
+            productsAdapter.submitList(it)
+        }
+    }
+
+    private fun initializeRecyclerView() {
+        binding.productList.adapter = productsAdapter
     }
 
     override fun onDestroyView() {
