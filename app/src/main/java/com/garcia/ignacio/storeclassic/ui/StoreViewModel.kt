@@ -22,6 +22,10 @@ class StoreViewModel @Inject constructor(
     private var pendingAddToCart: AddToCart? = null
 
     init {
+        getRepositoryProducts()
+    }
+
+    private fun getRepositoryProducts() {
         repository.products.flowOn(
             Dispatchers.IO
         ).onEach { result ->
