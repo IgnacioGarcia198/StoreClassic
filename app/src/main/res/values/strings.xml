@@ -4,6 +4,7 @@
     <string name="product_list_fragment_label">Store Product list</string>
     <string name="see_discounts">See discounts</string>
     <string name="euro_currency_format" translatable="false">%s €</string>
+    <string name="retrieving_products">Retrieving products…</string>
 
 
 

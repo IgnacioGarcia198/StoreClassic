@@ -18,11 +18,11 @@ import javax.inject.Inject
 class StoreViewModel @Inject constructor(
     private val repository: ProductsRepository
 ) : ViewModel() {
-    private val products = MutableLiveData(emptyList<Product>())
-    fun getProducts(): LiveData<List<Product>> = products
+    private val state = MutableLiveData<State>(State.Loading)
+    fun getState(): LiveData<State> = state
     var pendingAddToCart: AddToCart? = null
         private set
-    private val effect: MutableLiveData<Event<Effect>> = MutableLiveData(Event(Effect.Idle))
+    private val effect = MutableLiveData<Event<Effect>>(Event(Effect.Idle))
     fun getEffect(): LiveData<Event<Effect>> = effect
 
     init {
@@ -33,7 +33,7 @@ class StoreViewModel @Inject constructor(
         repository.products.flowOn(
             Dispatchers.IO
         ).onEach { result ->
-            products.value = result.result
+            state.value = State.Ready(result.result)
         }.launchIn(viewModelScope)
     }
 
@@ -45,5 +45,10 @@ class StoreViewModel @Inject constructor(
     sealed interface Effect {
         object Idle : Effect
         object AddToCartConfirmation : Effect
+    }
+
+    sealed interface State {
+        object Loading : State
+        data class Ready(val products: List<Product>) : State
     }
 }

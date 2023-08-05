@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
@@ -36,14 +37,37 @@ class ProductListFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getProducts().observe(viewLifecycleOwner) {
-            productsAdapter.submitList(it)
+        viewModel.getState().observe(viewLifecycleOwner) {
+            renderState(it)
         }
         viewModel.getEffect().observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let {
                 renderEffect(it)
             }
         }
+    }
+
+    private fun renderState(state: StoreViewModel.State) {
+        when (state) {
+            StoreViewModel.State.Loading -> {
+                showLoading()
+            }
+
+            is StoreViewModel.State.Ready -> {
+                hideLoading()
+                productsAdapter.submitList(state.products)
+            }
+        }
+    }
+
+    private fun hideLoading() {
+        binding.loading.hide()
+        binding.loadingText.isVisible = false
+    }
+
+    private fun showLoading() {
+        binding.loading.show()
+        binding.loadingText.isVisible = true
     }
 
     private fun renderEffect(effect: StoreViewModel.Effect) {
@@ -60,7 +84,7 @@ class ProductListFragment : Fragment() {
     }
 
     private fun showAddToCartConfirmationDialog() {
-        TODO("Not yet implemented")
+
     }
 
     private fun initializeRecyclerView() {
