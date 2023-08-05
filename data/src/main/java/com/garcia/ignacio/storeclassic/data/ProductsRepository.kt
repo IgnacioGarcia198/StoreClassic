@@ -30,10 +30,16 @@ class ProductsRepository @Inject constructor(
             emit(emptyList())
         }.onEach {
             if (it.isNotEmpty()) localDataStore.updateProducts(it)
-        }.catch { throwable ->
-            errorStateFlow.value.add(throwable)
+        }.catch {
+            errorStateFlow.value.add(it)
             emit(emptyList())
-        }.flatMapConcat { localDataStore.getAllProducts() }
+        }.flatMapConcat {
+            localDataStore.getAllProducts()
+        }.catch {
+            errorStateFlow.value.add(it)
+            emit(emptyList())
+        }
+
 
     val products: Flow<ResultList<List<Product>>> =
         productsFlow.combine(errorStateFlow) { list, errors ->
