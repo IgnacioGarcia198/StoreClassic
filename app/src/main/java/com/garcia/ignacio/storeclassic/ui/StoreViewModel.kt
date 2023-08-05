@@ -39,6 +39,7 @@ class StoreViewModel @Inject constructor(
 
     fun pendingAddToCart(product: Product, quantity: Int) {
         pendingAddToCart = AddToCart(product, quantity)
+        effect.value = Event(Effect.Idle)
         effect.value = Event(Effect.AddToCartConfirmation)
     }
 
