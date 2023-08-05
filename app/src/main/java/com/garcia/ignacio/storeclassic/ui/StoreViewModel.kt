@@ -6,6 +6,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
@@ -19,7 +20,10 @@ class StoreViewModel @Inject constructor(
 ) : ViewModel() {
     private val products = MutableLiveData(emptyList<Product>())
     fun getProducts(): LiveData<List<Product>> = products
-    private var pendingAddToCart: AddToCart? = null
+    var pendingAddToCart: AddToCart? = null
+        private set
+    private val effect: MutableLiveData<Event<Effect>> = MutableLiveData(Event(Effect.Idle))
+    fun getEffect(): LiveData<Event<Effect>> = effect
 
     init {
         getRepositoryProducts()
@@ -35,5 +39,11 @@ class StoreViewModel @Inject constructor(
 
     fun pendingAddToCart(product: Product, quantity: Int) {
         pendingAddToCart = AddToCart(product, quantity)
+        effect.value = Event(Effect.AddToCartConfirmation)
+    }
+
+    sealed interface Effect {
+        object Idle : Effect
+        object AddToCartConfirmation : Effect
     }
 }

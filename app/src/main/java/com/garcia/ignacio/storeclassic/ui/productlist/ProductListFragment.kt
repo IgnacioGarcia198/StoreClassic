@@ -39,6 +39,28 @@ class ProductListFragment : Fragment() {
         viewModel.getProducts().observe(viewLifecycleOwner) {
             productsAdapter.submitList(it)
         }
+        viewModel.getEffect().observe(viewLifecycleOwner) { event ->
+            event.getContentIfNotHandled()?.let {
+                renderEffect(it)
+            }
+        }
+    }
+
+    private fun renderEffect(effect: StoreViewModel.Effect) {
+        when (effect) {
+            StoreViewModel.Effect.AddToCartConfirmation ->
+                viewModel.pendingAddToCart?.let {
+                    showAddToCartConfirmationDialog()
+                }
+
+            StoreViewModel.Effect.Idle -> {
+                // NOP
+            }
+        }
+    }
+
+    private fun showAddToCartConfirmationDialog() {
+        TODO("Not yet implemented")
     }
 
     private fun initializeRecyclerView() {
