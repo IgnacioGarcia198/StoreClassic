@@ -17,12 +17,10 @@ import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 class ProductsRepository @Inject constructor(
-    private val storeClient: StoreClient,
+    storeClient: StoreClient,
     private val localDataStore: ProductsLocalDataStore,
 ) {
     private val errorStateFlow = MutableStateFlow(mutableListOf<Throwable>())
-
-    fun getClientProducts(): Flow<List<Product>> = storeClient.getProducts()
 
     private val productsFlow: Flow<List<Product>> =
         storeClient.getProducts().onEach {
