@@ -7,9 +7,9 @@
 
     <fragment
         android:id="@+id/FirstFragment"
-        android:name="com.garcia.ignacio.storeclassic.FirstFragment"
-        android:label="@string/first_fragment_label"
-        tools:layout="@layout/fragment_first">
+        android:name="com.garcia.ignacio.storeclassic.ProductListFragment"
+        android:label="@string/product_list_fragment_label"
+        tools:layout="@layout/fragment_product_list">
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"

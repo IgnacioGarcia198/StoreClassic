@@ -6,28 +6,22 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import androidx.navigation.fragment.findNavController
-import com.garcia.ignacio.storeclassic.databinding.FragmentFirstBinding
+import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import dagger.hilt.android.AndroidEntryPoint
 
-/**
- * A simple [Fragment] subclass as the default destination in the navigation.
- */
 @AndroidEntryPoint
-class FirstFragment : Fragment() {
+class ProductListFragment : Fragment() {
 
-    private var _binding: FragmentFirstBinding? = null
+    private var _binding: FragmentProductListBinding? = null
     private val viewModel: StoreViewModel by viewModels()
 
-    // This property is only valid between onCreateView and
-    // onDestroyView.
     private val binding get() = _binding!!
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-        _binding = FragmentFirstBinding.inflate(inflater, container, false)
+        _binding = FragmentProductListBinding.inflate(inflater, container, false)
         return binding.root
 
     }
@@ -35,10 +29,6 @@ class FirstFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         viewModel
-
-        binding.buttonFirst.setOnClickListener {
-            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-        }
     }
 
     override fun onDestroyView() {
