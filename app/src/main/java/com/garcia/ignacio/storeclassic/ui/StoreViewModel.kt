@@ -9,7 +9,8 @@ import com.garcia.ignacio.storeclassic.domain.models.Product
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -20,10 +21,10 @@ class StoreViewModel @Inject constructor(
     fun getProducts(): LiveData<List<Product>> = products
 
     init {
-        viewModelScope.launch {
-            repository.products.flowOn(Dispatchers.IO).collect { result ->
-                products.value = result.result
-            }
-        }
+        repository.products.flowOn(
+            Dispatchers.IO
+        ).onEach { result ->
+            products.value = result.result
+        }.launchIn(viewModelScope)
     }
 }
