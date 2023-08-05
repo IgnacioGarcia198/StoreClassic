@@ -9,6 +9,7 @@ import io.ktor.client.request.get
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.json.Json
 import javax.inject.Inject
 
 private const val PRODUCTS_ENDPOINT =
@@ -22,7 +23,8 @@ class CabifyStoreClient @Inject constructor(
     }
 
     override fun getProducts(): Flow<List<Product>> = flowOf(
-        runBlocking { httpClient.get(PRODUCTS_ENDPOINT).body<ProductsResponse>() }
-            .products.map { it.toDomain() }
+        Json.decodeFromString<ProductsResponse>(
+            runBlocking { httpClient.get(PRODUCTS_ENDPOINT).body() }
+        ).products.map { it.toDomain() }
     )
 }
