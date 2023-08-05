@@ -23,7 +23,7 @@ class ProductViewHolder(
             android.R.layout.simple_spinner_item,
             (1..10).toMutableList()
         ).also { adapter ->
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_item)
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.addToCart.adapter = adapter
         }
     }
