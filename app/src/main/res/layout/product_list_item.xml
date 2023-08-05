@@ -42,7 +42,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"/>
 
-        <Spinner
+        <com.garcia.ignacio.storeclassic.ui.customview.AlwaysChangeSpinner
             android:id="@+id/addToCart"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
