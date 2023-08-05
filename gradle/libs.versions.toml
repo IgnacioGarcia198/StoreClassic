@@ -49,7 +49,7 @@ dagger = { module = "com.google.dagger:dagger", version.ref = "dagger" }
 dagger-compiler = { module = "com.google.dagger:dagger-compiler", version.ref = "dagger" }
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerialization" }
 kotlinx-coroutines-core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
-androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "androidxRoom"}
+androidx-room = { module = "androidx.room:room-ktx", version.ref = "androidxRoom"}
 androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "androidxRoom"}
 
 junit = { module = "junit:junit", version.ref = "junit" }
