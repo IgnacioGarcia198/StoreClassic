@@ -19,6 +19,7 @@ class StoreViewModel @Inject constructor(
 ) : ViewModel() {
     private val products = MutableLiveData(emptyList<Product>())
     fun getProducts(): LiveData<List<Product>> = products
+    private var pendingAddToCart: AddToCart? = null
 
     init {
         repository.products.flowOn(
@@ -26,5 +27,9 @@ class StoreViewModel @Inject constructor(
         ).onEach { result ->
             products.value = result.result
         }.launchIn(viewModelScope)
+    }
+
+    fun pendingAddToCart(product: Product, quantity: Int) {
+        pendingAddToCart = AddToCart(product, quantity)
     }
 }

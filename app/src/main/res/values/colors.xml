@@ -3,4 +3,7 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="discount_background">#DAF7A6</color>
+    <color name="add_to_cart_pressed_tint">#f4d03f</color>
+    <color name="colorPrimary">#683ECF</color>
+    <color name="colorAccent">@color/colorPrimary</color>
 </resources>

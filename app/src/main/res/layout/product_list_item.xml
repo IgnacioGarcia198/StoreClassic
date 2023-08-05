@@ -37,7 +37,21 @@
             android:paddingTop="2dp"
             android:paddingBottom="3dp"
             android:text="@string/see_discounts"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toStartOf="@id/addToCart"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"/>
+
+        <Spinner
+            android:id="@+id/addToCart"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:dropDownVerticalOffset="24dp"
+            android:background="@drawable/add_to_cart_background"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintDimensionRatio="1"
+            android:contentDescription="@string/add_to_cart"/>
     </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.cardview.widget.CardView>

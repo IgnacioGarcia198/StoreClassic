@@ -41,7 +41,9 @@ class ProductListFragment : Fragment() {
     }
 
     private fun initializeRecyclerView() {
-        binding.productList.adapter = productsAdapter
+        binding.productList.adapter = productsAdapter.also {
+            it.initialize(viewModel)
+        }
     }
 
     override fun onDestroyView() {
