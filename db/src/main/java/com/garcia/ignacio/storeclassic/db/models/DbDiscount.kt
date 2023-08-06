@@ -14,35 +14,44 @@ data class DbDiscount(
     @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
     fun toDomain(): Discount = when (type) {
-        Discount.BuyInBulk::class.simpleName ->
+        Discount.BuyInBulk.TYPE ->
             Discount.BuyInBulk(
                 productCode = productCode!!,
                 minimumBought = params.first().toInt(),
                 discountPercent = params[1]
             )
 
-        Discount.XForY::class.simpleName -> {
+        Discount.XForY.TYPE ->
             Discount.XForY(
                 productCode = productCode!!,
                 productsBought = params.first().toInt(),
                 productsPaid = params[1].toInt()
             )
-        }
 
-        else -> throw NotImplementedError("Misusing: $type is not implemented and should not be in the db!!")
+        else ->
+            Discount.Unimplemented(type, productCode, params)
     }
 }
 
 fun Discount.toDbDiscount(): DbDiscount = when (this) {
-    is Discount.BuyInBulk -> DbDiscount(
-        type = this::class.simpleName!!,
-        productCode = productCode,
-        params = listOf(minimumBought.toDouble(), discountPercent)
-    )
+    is Discount.BuyInBulk ->
+        DbDiscount(
+            type = Discount.BuyInBulk.TYPE,
+            productCode = productCode,
+            params = listOf(minimumBought.toDouble(), discountPercent)
+        )
 
-    is Discount.XForY -> DbDiscount(
-        type = this::class.simpleName!!,
-        productCode = productCode,
-        params = listOf(productsBought.toDouble(), productsPaid.toDouble())
-    )
+    is Discount.XForY ->
+        DbDiscount(
+            type = Discount.XForY.TYPE,
+            productCode = productCode,
+            params = listOf(productsBought.toDouble(), productsPaid.toDouble())
+        )
+
+    is Discount.Unimplemented ->
+        DbDiscount(
+            type = Discount.Unimplemented.TYPE,
+            productCode = productCode,
+            params = params
+        )
 }

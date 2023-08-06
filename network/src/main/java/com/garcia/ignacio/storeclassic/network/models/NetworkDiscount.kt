@@ -7,24 +7,24 @@ import kotlinx.serialization.Serializable
 data class NetworkDiscount(
     val type: String,
     val productCode: String?,
-    val params: List<Double>
+    val params: List<Double>,
 ) {
     fun toDomain(): Discount = when (type) {
-        Discount.BuyInBulk::class.simpleName ->
+        Discount.BuyInBulk.TYPE ->
             Discount.BuyInBulk(
                 productCode = productCode!!,
                 minimumBought = params.first().toInt(),
                 discountPercent = params[1]
             )
 
-        Discount.XForY::class.simpleName -> {
+        Discount.XForY.TYPE ->
             Discount.XForY(
                 productCode = productCode!!,
                 productsBought = params.first().toInt(),
                 productsPaid = params[1].toInt()
             )
-        }
 
-        else -> throw NotImplementedError(type)
+        else ->
+            Discount.Unimplemented(type, productCode, params)
     }
 }
