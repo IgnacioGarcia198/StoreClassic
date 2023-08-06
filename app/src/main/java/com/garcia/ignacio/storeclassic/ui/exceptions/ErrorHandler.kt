@@ -7,8 +7,29 @@ import javax.inject.Inject
 class ErrorHandler @Inject constructor() {
 
     fun handleErrors(errors: List<Throwable>, errorType: ErrorType) {
-        errors.forEach { error ->
-            handleError(error, errorType)
+        when (errorType) {
+            ErrorType.PRODUCT ->
+                errors.forEach { error ->
+                    handleError(error, errorType)
+                }
+
+            ErrorType.DISCOUNT -> {
+                val (unimplemented, otherErrors) = errors.partition {
+                    it is StoreException.UnimplementedDiscount
+                }
+                handleUnimplementedDiscounts(unimplemented)
+                otherErrors.forEach { error ->
+                    handleError(error, errorType)
+                }
+            }
+        }
+    }
+
+    private fun handleUnimplementedDiscounts(unimplemented: List<Throwable>) {
+        unimplemented.map {
+            (it as StoreException.UnimplementedDiscount).discount.productCode
+        }.groupBy { it }.keys.let {
+            // report unimplemented discount keys
         }
     }
 
@@ -21,7 +42,9 @@ class ErrorHandler @Inject constructor() {
                 handleStoreException(error, errorType)
             }
 
-            else -> {}
+            else -> {
+                // report generic error
+            }
         }
     }
 
@@ -33,22 +56,13 @@ class ErrorHandler @Inject constructor() {
             is StoreException.StageException ->
                 handleStageException(error, errorType)
 
-            is StoreException.Misusing -> {}
-            is StoreException.UnimplementedDiscount ->
-                handleUnimplementedDiscount(errorType, error)
+            is StoreException.Misusing -> {
+                // report to the developers
+            }
 
-        }
-    }
-
-    private fun handleUnimplementedDiscount(
-        errorType: ErrorType,
-        error: StoreException
-    ) {
-        when (errorType) {
-            ErrorType.PRODUCT ->
-                throw StoreException.Misusing("Error not allowed for Product: $error")
-
-            ErrorType.DISCOUNT -> {}
+            else -> {
+                // NOP
+            }
         }
     }
 
@@ -57,9 +71,30 @@ class ErrorHandler @Inject constructor() {
         errorType: ErrorType
     ) {
         when (error.stage) {
-            Stage.CLIENT -> {}
-            Stage.DB_WRITE -> {}
-            Stage.DB_READ -> {}
+            Stage.CLIENT -> handleClientError(error, errorType)
+            Stage.DB_WRITE -> handleDbWriteError(error, errorType)
+            Stage.DB_READ -> handleDbReadError(error, errorType)
+        }
+    }
+
+    private fun handleClientError(error: StoreException.StageException, type: ErrorType) {
+        when (type) {
+            ErrorType.PRODUCT -> {}
+            ErrorType.DISCOUNT -> {}
+        }
+    }
+
+    private fun handleDbWriteError(error: StoreException.StageException, type: ErrorType) {
+        when (type) {
+            ErrorType.PRODUCT -> {}
+            ErrorType.DISCOUNT -> {}
+        }
+    }
+
+    private fun handleDbReadError(error: StoreException.StageException, type: ErrorType) {
+        when (type) {
+            ErrorType.PRODUCT -> {}
+            ErrorType.DISCOUNT -> {}
         }
     }
 }
