@@ -1,17 +1,23 @@
 package com.garcia.ignacio.storeclassic.domain.models
 
+private val ALL_PRODUCTS: String? = null
+
 sealed class Discount {
     abstract val productCode: String?
 
-    fun apply(products: List<Product>) {
-        val applicableProducts = productCode?.let { code ->
-            products.filter { it.code == code }
-        } ?: products
-        if (applicableProducts.isNotEmpty()) {
-            applyDiscount(applicableProducts)
+    fun apply(products: List<Product>): Double = when (productCode) {
+        ALL_PRODUCTS -> applyToAll(products)
+        else -> products.filter {
+            it.code == productCode
+        }.let { applicableProducts ->
+            if (applicableProducts.isNotEmpty()) applyDiscount(applicableProducts)
+            else 0.0
         }
     }
 
+    protected open fun applyToAll(products: List<Product>): Double {
+        return products.groupBy { it.code }.values.sumOf { applyDiscount(it) }
+    }
 
     protected abstract fun applyDiscount(applicableProducts: List<Product>): Double
 
