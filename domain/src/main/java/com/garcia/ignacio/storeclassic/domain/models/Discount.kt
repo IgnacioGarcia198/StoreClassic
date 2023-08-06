@@ -36,6 +36,10 @@ sealed class Discount {
             return completeGroupProducts * originalPrice * productsPaid / productsBought +
                     singleProducts * originalPrice
         }
+
+        companion object {
+            const val TYPE = "XForY"
+        }
     }
 
     data class BuyInBulk(
@@ -49,6 +53,24 @@ sealed class Discount {
                 originalPrice * (1 - discountPercent / 100)
             } else originalPrice
             return applicableProducts.size * price
+        }
+
+        companion object {
+            const val TYPE = "BuyInBulk"
+        }
+    }
+
+    data class Unimplemented(
+        val type: String,
+        override val productCode: String?,
+        val params: List<Double>,
+    ) : Discount() {
+        override fun applyDiscount(applicableProducts: List<Product>): Double {
+            return applicableProducts.sumOf { it.price }
+        }
+
+        companion object {
+            const val TYPE = "Unimplemented"
         }
     }
 }
