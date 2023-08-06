@@ -4,6 +4,7 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
@@ -16,7 +17,8 @@ import javax.inject.Inject
 
 @HiltViewModel
 class StoreViewModel @Inject constructor(
-    private val repository: ProductsRepository
+    private val productsRepository: ProductsRepository,
+    private val discountsRepository: DiscountsRepository,
 ) : ViewModel() {
     private val state = MutableLiveData<State>(State.Loading)
     fun getState(): LiveData<State> = state
@@ -30,10 +32,18 @@ class StoreViewModel @Inject constructor(
     }
 
     private fun getRepositoryProducts() {
-        repository.products.flowOn(
+        productsRepository.products.flowOn(
             Dispatchers.IO
         ).onEach { result ->
             state.value = State.Ready(result.result)
+        }.launchIn(viewModelScope)
+    }
+
+    private fun getRepositoryDiscounts() {
+        discountsRepository.discounts.flowOn(
+            Dispatchers.IO
+        ).onEach { result ->
+            //state.value = State.Ready(result.result)
         }.launchIn(viewModelScope)
     }
 
