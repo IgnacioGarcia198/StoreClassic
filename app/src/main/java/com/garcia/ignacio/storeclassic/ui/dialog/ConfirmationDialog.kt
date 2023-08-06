@@ -26,8 +26,8 @@ class ConfirmationDialog : DialogFragment(), DialogInterface.OnClickListener {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         listener = when {
-            activity is Listener -> activity as Listener
             parentFragment is Listener -> parentFragment as Listener
+            activity is Listener -> activity as Listener
             else -> error(
                 "Either Activity or parent Fragment must implement " +
                         "ConfirmationDialog.Listener"
@@ -90,6 +90,10 @@ fun AppCompatActivity.showConfirmationDialog(
     cancelText: CharSequence? = null,
     neutralText: CharSequence? = null,
 ) {
+    assert(this is ConfirmationDialog.Listener) {
+        "${javaClass.simpleName} must implement " +
+                "ConfirmationDialog.Listener"
+    }
     val fragment = newInstance(tag, title, message, confirmText, cancelText, neutralText)
     supportFragmentManager
         .beginTransaction()
@@ -124,6 +128,10 @@ fun Fragment.showConfirmationDialog(
     cancelText: CharSequence? = null,
     neutralText: CharSequence? = null,
 ) {
+    assert(this is ConfirmationDialog.Listener) {
+        "${javaClass.simpleName} must implement " +
+                "ConfirmationDialog.Listener"
+    }
     val fragment = newInstance(tag, title, message, confirmText, cancelText, neutralText)
     childFragmentManager
         .beginTransaction()
