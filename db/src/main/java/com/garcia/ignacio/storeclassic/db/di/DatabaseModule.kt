@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.garcia.ignacio.storeclassic.db.dao.DiscountDao
 import com.garcia.ignacio.storeclassic.db.dao.ProductDao
-import com.garcia.ignacio.storeclassic.db.database.ProductDatabase
+import com.garcia.ignacio.storeclassic.db.database.StoreDatabase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -19,20 +19,20 @@ private const val DATABASE_NAME = "storeDb.db"
 class DatabaseModule {
     @Singleton
     @Provides
-    fun provideDatabase(application: Application): ProductDatabase {
+    fun provideDatabase(application: Application): StoreDatabase {
         return Room.databaseBuilder(
             application,
-            ProductDatabase::class.java, DATABASE_NAME
+            StoreDatabase::class.java, DATABASE_NAME
         ).build()
     }
 
     @Provides
-    fun provideProductDao(database: ProductDatabase): ProductDao {
+    fun provideProductDao(database: StoreDatabase): ProductDao {
         return database.productDao
     }
 
     @Provides
-    fun provideDiscountDao(database: ProductDatabase): DiscountDao {
+    fun provideDiscountDao(database: StoreDatabase): DiscountDao {
         return database.discountDao
     }
 }

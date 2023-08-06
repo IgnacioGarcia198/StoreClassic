@@ -11,7 +11,7 @@ import com.garcia.ignacio.storeclassic.db.models.DbProduct
     entities = [DbProduct::class, DbDiscount::class],
     version = 1
 )
-abstract class ProductDatabase : RoomDatabase() {
+abstract class StoreDatabase : RoomDatabase() {
     abstract val productDao: ProductDao
     abstract val discountDao: DiscountDao
 }
