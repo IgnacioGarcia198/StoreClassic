@@ -48,12 +48,16 @@ class StoreViewModel @Inject constructor(
     }
 
     fun pendingAddToCartConfirmed() {
-
+        pendingAddToCart?.let {
+            effect.value = Event(Effect.AddToCartConfirmed(it))
+            pendingAddToCart = null
+        }
     }
 
     sealed interface Effect {
         object Idle : Effect
         object AddToCartConfirmation : Effect
+        data class AddToCartConfirmed(val addToCart: AddToCart) : Effect
     }
 
     sealed interface State {

@@ -14,6 +14,10 @@
         <item quantity="one">Do you want to add one &lt;b>%2$s&lt;/b> to the shopping cart?</item>
         <item quantity="other">Do you want to add %1$d units of &lt;b>%2$s&lt;/b> to the shopping cart?</item>
     </plurals>
+    <plurals name="added_to_cart_feedback">
+        <item quantity="one">Added &lt;b>%2$s&lt;/b> to the shopping cart.</item>
+        <item quantity="other">Added %1$d units of &lt;b>%2$s&lt;/b> to the shopping cart.</item>
+    </plurals>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
 

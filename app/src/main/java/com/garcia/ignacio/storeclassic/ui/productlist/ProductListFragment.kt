@@ -5,6 +5,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -12,9 +13,11 @@ import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.AddToCart
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.dialog.ConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.dialog.showConfirmationDialog
+import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -98,16 +101,6 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun hideLoading() {
-        binding.loading.hide()
-        binding.loadingText.isVisible = false
-    }
-
-    private fun showLoading() {
-        binding.loading.show()
-        binding.loadingText.isVisible = true
-    }
-
     private fun renderEffect(effect: StoreViewModel.Effect) {
         when (effect) {
             StoreViewModel.Effect.AddToCartConfirmation ->
@@ -118,7 +111,35 @@ class ProductListFragment : Fragment() {
             StoreViewModel.Effect.Idle -> {
                 // NOP
             }
+
+            is StoreViewModel.Effect.AddToCartConfirmed -> {
+                showAddedToCartFeedback(effect.addToCart)
+            }
         }
+    }
+
+    private fun showAddedToCartFeedback(addToCart: AddToCart) {
+        val feedbackText = resources.getQuantityString(
+            R.plurals.added_to_cart_feedback,
+            addToCart.quantity,
+            addToCart.quantity,
+            addToCart.product.name
+        )
+        val feedbackHtml = HtmlCompat.fromHtml(feedbackText, HtmlCompat.FROM_HTML_MODE_COMPACT)
+        Snackbar.make(requireView(), feedbackHtml, Snackbar.LENGTH_SHORT)
+            .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
+            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.addedToCartToast))
+            .show()
+    }
+
+    private fun hideLoading() {
+        binding.loading.hide()
+        binding.loadingText.isVisible = false
+    }
+
+    private fun showLoading() {
+        binding.loading.show()
+        binding.loadingText.isVisible = true
     }
 
     private fun showAddToCartConfirmationDialog(product: Product, quantity: Int) {
