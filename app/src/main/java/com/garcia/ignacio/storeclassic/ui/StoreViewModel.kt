@@ -4,13 +4,15 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
+import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
@@ -27,21 +29,23 @@ class StoreViewModel @Inject constructor(
     private val effect = MutableLiveData<Event<Effect>>(Event(Effect.Idle))
     fun getEffect(): LiveData<Event<Effect>> = effect
 
+    private var discounts = emptyList<Discount>()
+
     init {
-        getRepositoryProducts()
+        getRepositoryDiscounts().combine(
+            getRepositoryProducts()
+        ) { _, _ -> }.launchIn(viewModelScope)
     }
 
-    private fun getRepositoryProducts() {
+    private fun getRepositoryProducts(): Flow<ResultList<List<Product>>> =
         productsRepository.products.onEach { result ->
             state.value = State.Ready(result.result)
-        }.launchIn(viewModelScope)
-    }
+        }
 
-    private fun getRepositoryDiscounts() {
+    private fun getRepositoryDiscounts(): Flow<ResultList<List<Discount>>> =
         discountsRepository.discounts.onEach { result ->
-            //state.value = State.Ready(result.result)
-        }.launchIn(viewModelScope)
-    }
+            discounts = result.result
+        }
 
     fun pendingAddToCart(product: Product, quantity: Int) {
         pendingAddToCart = AddToCart(product, quantity)
