@@ -8,6 +8,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResult
 
 private const val ARG_TAG = "dialogTag"
 private const val ARG_TITLE = "title"
@@ -17,22 +18,8 @@ private const val ARG_CANCEL_TEXT = "cancel"
 private const val ARG_NEUTRAL_TEXT = "neutral"
 
 class ConfirmationDialog : DialogFragment(), DialogInterface.OnClickListener {
-
-    private lateinit var listener: Listener
     private val dialogTag: String by lazy {
         arguments?.getString(ARG_TAG) ?: error("tag argument needed")
-    }
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        listener = when {
-            parentFragment is Listener -> parentFragment as Listener
-            activity is Listener -> activity as Listener
-            else -> error(
-                "Either Activity or parent Fragment must implement " +
-                        "ConfirmationDialog.Listener"
-            )
-        }
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
@@ -55,30 +42,16 @@ class ConfirmationDialog : DialogFragment(), DialogInterface.OnClickListener {
 
     override fun onCancel(dialog: DialogInterface) {
         super.onCancel(dialog)
-        listener.dialogCancelled(dialogTag)
+        setFragmentResult(dialogTag, bundleOf(RESULT_KEY to CANCELLED))
     }
 
     override fun onClick(dialog: DialogInterface?, which: Int) {
-        when (which) {
-            DialogInterface.BUTTON_POSITIVE -> {
-                listener.doPositiveClick(dialogTag)
-            }
-
-            DialogInterface.BUTTON_NEGATIVE -> {
-                listener.doNegativeClick(dialogTag)
-            }
-
-            DialogInterface.BUTTON_NEUTRAL -> {
-                listener.doNeutralClick(dialogTag)
-            }
-        }
+        setFragmentResult(dialogTag, bundleOf(RESULT_KEY to which))
     }
 
-    interface Listener {
-        fun doPositiveClick(dialogTag: String)
-        fun doNegativeClick(dialogTag: String)
-        fun doNeutralClick(dialogTag: String)
-        fun dialogCancelled(dialogTag: String)
+    companion object {
+        const val RESULT_KEY = "ConfirmationDialog"
+        const val CANCELLED = 0
     }
 }
 
@@ -90,10 +63,6 @@ fun AppCompatActivity.showConfirmationDialog(
     cancelText: CharSequence? = null,
     neutralText: CharSequence? = null,
 ) {
-    assert(this is ConfirmationDialog.Listener) {
-        "${javaClass.simpleName} must implement " +
-                "ConfirmationDialog.Listener"
-    }
     val fragment = newInstance(tag, title, message, confirmText, cancelText, neutralText)
     supportFragmentManager
         .beginTransaction()
@@ -128,10 +97,6 @@ fun Fragment.showConfirmationDialog(
     cancelText: CharSequence? = null,
     neutralText: CharSequence? = null,
 ) {
-    assert(this is ConfirmationDialog.Listener) {
-        "${javaClass.simpleName} must implement " +
-                "ConfirmationDialog.Listener"
-    }
     val fragment = newInstance(tag, title, message, confirmText, cancelText, neutralText)
     childFragmentManager
         .beginTransaction()

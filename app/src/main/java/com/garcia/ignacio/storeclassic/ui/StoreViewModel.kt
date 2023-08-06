@@ -43,6 +43,14 @@ class StoreViewModel @Inject constructor(
         effect.value = Event(Effect.AddToCartConfirmation)
     }
 
+    fun pendingAddToCartCancelled() {
+        pendingAddToCart = null
+    }
+
+    fun pendingAddToCartConfirmed() {
+
+    }
+
     sealed interface Effect {
         object Idle : Effect
         object AddToCartConfirmation : Effect

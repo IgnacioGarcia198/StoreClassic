@@ -1,5 +1,6 @@
 package com.garcia.ignacio.storeclassic.ui.productlist
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,7 +21,7 @@ import javax.inject.Inject
 private const val ADD_TO_CART_CONFIRMATION_DIALOG = "AddToCartConfirmation"
 
 @AndroidEntryPoint
-class ProductListFragment : Fragment(), ConfirmationDialog.Listener {
+class ProductListFragment : Fragment() {
 
     private var _binding: FragmentProductListBinding? = null
     private val binding get() = _binding!!
@@ -28,6 +29,35 @@ class ProductListFragment : Fragment(), ConfirmationDialog.Listener {
 
     @Inject
     lateinit var productsAdapter: ProductsAdapter
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        childFragmentManager.setFragmentResultListener(
+            ADD_TO_CART_CONFIRMATION_DIALOG,
+            requireActivity()
+        ) { _, bundle ->
+            val addToCartConfirmationResult = bundle.getInt(ConfirmationDialog.RESULT_KEY)
+            processAddToCartConfirmationResult(addToCartConfirmationResult)
+        }
+    }
+
+    private fun processAddToCartConfirmationResult(addToCartConfirmationResult: Int) {
+        when (addToCartConfirmationResult) {
+            DialogInterface.BUTTON_POSITIVE -> addToCartConfirmed()
+            DialogInterface.BUTTON_NEGATIVE,
+            ConfirmationDialog.CANCELLED -> addToCartCancelled()
+
+            else -> error("unexpected result: $addToCartConfirmationResult")
+        }
+    }
+
+    private fun addToCartCancelled() {
+        viewModel.pendingAddToCartCancelled()
+    }
+
+    private fun addToCartConfirmed() {
+        viewModel.pendingAddToCartConfirmed()
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -108,22 +138,6 @@ class ProductListFragment : Fragment(), ConfirmationDialog.Listener {
         binding.productList.adapter = productsAdapter.also {
             it.initialize(viewModel)
         }
-    }
-
-    override fun doPositiveClick(dialogTag: String) {
-
-    }
-
-    override fun doNegativeClick(dialogTag: String) {
-
-    }
-
-    override fun doNeutralClick(dialogTag: String) {
-
-    }
-
-    override fun dialogCancelled(dialogTag: String) {
-
     }
 
     override fun onDestroyView() {
