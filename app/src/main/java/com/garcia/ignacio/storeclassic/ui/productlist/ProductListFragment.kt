@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
@@ -35,9 +36,8 @@ class ProductListFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        childFragmentManager.setFragmentResultListener(
-            ADD_TO_CART_CONFIRMATION_DIALOG,
-            requireActivity()
+        setFragmentResultListener(
+            ADD_TO_CART_CONFIRMATION_DIALOG
         ) { _, bundle ->
             val addToCartConfirmationResult = bundle.getInt(ConfirmationDialog.RESULT_KEY)
             processAddToCartConfirmationResult(addToCartConfirmationResult)
