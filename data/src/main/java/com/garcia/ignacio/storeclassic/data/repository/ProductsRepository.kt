@@ -1,6 +1,8 @@
 package com.garcia.ignacio.storeclassic.data.repository
 
 import com.garcia.ignacio.storeclassic.common.ResultList
+import com.garcia.ignacio.storeclassic.data.exceptions.Stage
+import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.storeclassic.domain.models.Product
@@ -26,17 +28,17 @@ class ProductsRepository @Inject constructor(
         storeClient.getProducts().onEach {
             errorStateFlow.value.clear()
         }.catch {
-            errorStateFlow.value = mutableListOf(it)
+            errorStateFlow.value = mutableListOf(StoreException(Stage.CLIENT, it))
             emit(emptyList())
         }.onEach {
             if (it.isNotEmpty()) localDataStore.updateProducts(it)
         }.catch {
-            errorStateFlow.value.add(it)
+            errorStateFlow.value.add(StoreException(Stage.DB_WRITE, it))
             emit(emptyList())
         }.flatMapConcat {
             localDataStore.getAllProducts()
         }.catch {
-            errorStateFlow.value.add(it)
+            errorStateFlow.value.add(StoreException(Stage.DB_READ, it))
             emit(emptyList())
         }
 

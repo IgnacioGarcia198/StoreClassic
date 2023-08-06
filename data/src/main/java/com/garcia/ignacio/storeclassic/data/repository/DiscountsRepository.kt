@@ -1,6 +1,9 @@
 package com.garcia.ignacio.storeclassic.data.repository
 
 import com.garcia.ignacio.storeclassic.common.ResultList
+import com.garcia.ignacio.storeclassic.data.exceptions.Stage
+import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
+import com.garcia.ignacio.storeclassic.data.exceptions.UnimplementedDiscount
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.storeclassic.domain.models.Discount
@@ -26,18 +29,19 @@ class DiscountsRepository @Inject constructor(
         storeClient.getDiscounts().onEach {
             errorStateFlow.value.clear()
         }.catch {
-            errorStateFlow.value = mutableListOf(it)
+            errorStateFlow.value = mutableListOf(StoreException(Stage.CLIENT, it))
             emit(emptyList())
         }.onEach { discounts ->
             val (unimplemented, valid) = discounts.partition { it is Discount.Unimplemented }
+            unimplemented.forEach { errorStateFlow.value.add(UnimplementedDiscount(it)) }
             if (valid.isNotEmpty()) localDataStore.updateDiscounts(valid)
         }.catch {
-            errorStateFlow.value.add(it)
+            errorStateFlow.value.add(StoreException(Stage.DB_WRITE, it))
             emit(emptyList())
         }.flatMapConcat {
             localDataStore.getAllDiscounts()
         }.catch {
-            errorStateFlow.value.add(it)
+            errorStateFlow.value.add(StoreException(Stage.DB_READ, it))
             emit(emptyList())
         }
 
