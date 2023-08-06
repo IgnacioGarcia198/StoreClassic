@@ -2,6 +2,7 @@ package com.garcia.ignacio.storeclassic.db.di
 
 import android.app.Application
 import androidx.room.Room
+import com.garcia.ignacio.storeclassic.db.dao.DiscountDao
 import com.garcia.ignacio.storeclassic.db.dao.ProductDao
 import com.garcia.ignacio.storeclassic.db.database.ProductDatabase
 import dagger.Module
@@ -28,5 +29,10 @@ class DatabaseModule {
     @Provides
     fun provideProductDao(database: ProductDatabase): ProductDao {
         return database.productDao
+    }
+
+    @Provides
+    fun provideDiscountDao(database: ProductDatabase): DiscountDao {
+        return database.discountDao
     }
 }
