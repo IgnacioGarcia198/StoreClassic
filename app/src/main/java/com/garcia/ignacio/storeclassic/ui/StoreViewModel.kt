@@ -9,6 +9,8 @@ import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
+import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
@@ -21,6 +23,7 @@ import javax.inject.Inject
 class StoreViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
     private val discountsRepository: DiscountsRepository,
+    private val errorHandler: ErrorHandler,
 ) : ViewModel() {
     private val state = MutableLiveData<State>(State.Loading)
     fun getState(): LiveData<State> = state
@@ -40,11 +43,13 @@ class StoreViewModel @Inject constructor(
     private fun getRepositoryProducts(): Flow<ResultList<List<Product>>> =
         productsRepository.products.onEach { result ->
             state.value = State.Ready(result.result)
+            errorHandler.handleErrors(result.errors, ErrorType.PRODUCT)
         }
 
     private fun getRepositoryDiscounts(): Flow<ResultList<List<Discount>>> =
         discountsRepository.discounts.onEach { result ->
             discounts = result.result
+            errorHandler.handleErrors(result.errors, ErrorType.DISCOUNT)
         }
 
     fun pendingAddToCart(product: Product, quantity: Int) {
