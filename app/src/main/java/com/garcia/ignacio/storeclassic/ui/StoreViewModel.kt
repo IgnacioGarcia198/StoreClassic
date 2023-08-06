@@ -32,17 +32,13 @@ class StoreViewModel @Inject constructor(
     }
 
     private fun getRepositoryProducts() {
-        productsRepository.products.flowOn(
-            Dispatchers.IO
-        ).onEach { result ->
+        productsRepository.products.onEach { result ->
             state.value = State.Ready(result.result)
         }.launchIn(viewModelScope)
     }
 
     private fun getRepositoryDiscounts() {
-        discountsRepository.discounts.flowOn(
-            Dispatchers.IO
-        ).onEach { result ->
+        discountsRepository.discounts.onEach { result ->
             //state.value = State.Ready(result.result)
         }.launchIn(viewModelScope)
     }
