@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.data
+package com.garcia.ignacio.storeclassic.data.repository
 
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
