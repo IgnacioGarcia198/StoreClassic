@@ -2,6 +2,7 @@ package com.garcia.ignacio.storeclassic.db.dao
 
 import androidx.room.Dao
 import androidx.room.Insert
+import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import com.garcia.ignacio.storeclassic.db.models.DbDiscount
 import kotlinx.coroutines.flow.Flow
@@ -11,6 +12,6 @@ interface DiscountDao {
     @Query("SELECT * FROM discounts")
     fun getAll(): Flow<List<DbDiscount>>
 
-    @Insert
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertAll(products: List<DbDiscount>)
 }
