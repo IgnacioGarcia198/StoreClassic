@@ -1,27 +1,33 @@
 package com.garcia.ignacio.storeclassic.ui.exceptions
 
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import javax.inject.Inject
 
 class ErrorHandler @Inject constructor() {
 
-    fun handleErrors(errors: List<Throwable>, errorType: ErrorType) {
+    fun handleErrors(
+        errors: List<Throwable>,
+        errorType: ErrorType,
+    ) {
         when (errorType) {
             ErrorType.PRODUCT ->
-                errors.forEach { error ->
-                    handleError(error, errorType)
-                }
+                handleAllErrors(errors)
 
             ErrorType.DISCOUNT -> {
                 val (unimplemented, otherErrors) = errors.partition {
                     it is StoreException.UnimplementedDiscount
                 }
                 handleUnimplementedDiscounts(unimplemented)
-                otherErrors.forEach { error ->
-                    handleError(error, errorType)
-                }
+                handleAllErrors(otherErrors)
             }
+        }
+    }
+
+    private fun handleAllErrors(errors: List<Throwable>) {
+        errors.forEach { error ->
+            handleError(error)
         }
     }
 
@@ -35,11 +41,10 @@ class ErrorHandler @Inject constructor() {
 
     private fun handleError(
         error: Throwable,
-        errorType: ErrorType
     ) {
         when (error) {
             is StoreException -> {
-                handleStoreException(error, errorType)
+                handleStoreException(error)
             }
 
             else -> {
@@ -50,51 +55,46 @@ class ErrorHandler @Inject constructor() {
 
     private fun handleStoreException(
         error: StoreException,
-        errorType: ErrorType
     ) {
         when (error) {
             is StoreException.StageException ->
-                handleStageException(error, errorType)
+                handleStageException(error)
 
             is StoreException.Misusing -> {
                 // report to the developers
             }
 
-            else -> {
-                // NOP
+            is StoreException.UnimplementedDiscount -> {
+                // already handled
             }
         }
     }
 
     private fun handleStageException(
         error: StoreException.StageException,
-        errorType: ErrorType
     ) {
+        when (error.errorType) {
+            ErrorType.PRODUCT ->
+                handleProductStageException(error)
+
+            ErrorType.DISCOUNT ->
+                handleDiscountStageException(error)
+        }
+    }
+
+    private fun handleProductStageException(error: StoreException.StageException) {
         when (error.stage) {
-            Stage.CLIENT -> handleClientError(error, errorType)
-            Stage.DB_WRITE -> handleDbWriteError(error, errorType)
-            Stage.DB_READ -> handleDbReadError(error, errorType)
+            Stage.CLIENT -> {}
+            Stage.DB_WRITE -> {}
+            Stage.DB_READ -> {}
         }
     }
 
-    private fun handleClientError(error: StoreException.StageException, type: ErrorType) {
-        when (type) {
-            ErrorType.PRODUCT -> {}
-            ErrorType.DISCOUNT -> {}
-        }
-    }
-
-    private fun handleDbWriteError(error: StoreException.StageException, type: ErrorType) {
-        when (type) {
-            ErrorType.PRODUCT -> {}
-            ErrorType.DISCOUNT -> {}
-        }
-    }
-
-    private fun handleDbReadError(error: StoreException.StageException, type: ErrorType) {
-        when (type) {
-            ErrorType.PRODUCT -> {}
-            ErrorType.DISCOUNT -> {}
+    private fun handleDiscountStageException(error: StoreException.StageException) {
+        when (error.stage) {
+            Stage.CLIENT -> {}
+            Stage.DB_WRITE -> {}
+            Stage.DB_READ -> {}
         }
     }
 }

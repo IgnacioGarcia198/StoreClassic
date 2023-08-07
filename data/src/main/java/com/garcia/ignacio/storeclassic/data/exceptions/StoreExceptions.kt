@@ -5,6 +5,7 @@ import com.garcia.ignacio.storeclassic.domain.models.Discount
 sealed interface StoreException {
     class StageException(
         val stage: Stage,
+        val errorType: ErrorType,
         cause: Throwable?,
         message: String? = cause?.message
     ) : RuntimeException(message, cause), StoreException

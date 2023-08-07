@@ -1,8 +1,9 @@
 package com.garcia.ignacio.storeclassic.data.repository
 
 import com.garcia.ignacio.storeclassic.common.ResultList
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
-import com.garcia.ignacio.storeclassic.data.exceptions.StoreException.StageException
+import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException.UnimplementedDiscount
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
@@ -29,22 +30,30 @@ class DiscountsRepository @Inject constructor(
         storeClient.getDiscounts().onEach {
             errorStateFlow.value.clear()
         }.catch {
-            errorStateFlow.value = mutableListOf(StageException(Stage.CLIENT, it))
+            errorStateFlow.value = mutableListOf(stageException(Stage.CLIENT, it))
             emit(emptyList())
         }.onEach { discounts ->
             val (unimplemented, valid) = discounts.partition { it is Discount.Unimplemented }
             unimplemented.forEach { errorStateFlow.value.add(UnimplementedDiscount(it)) }
             if (valid.isNotEmpty()) localDataStore.updateDiscounts(valid)
         }.catch {
-            errorStateFlow.value.add(StageException(Stage.DB_WRITE, it))
+            errorStateFlow.value.add(stageException(Stage.DB_WRITE, it))
             emit(emptyList())
         }.flatMapConcat {
             localDataStore.getAllDiscounts()
         }.catch {
-            errorStateFlow.value.add(StageException(Stage.DB_READ, it))
+            errorStateFlow.value.add(stageException(Stage.DB_READ, it))
             emit(emptyList())
         }
 
+    private fun stageException(
+        stage: Stage,
+        cause: Throwable?,
+    ): StoreException.StageException = StoreException.StageException(
+        stage = stage,
+        errorType = ErrorType.DISCOUNT,
+        cause = cause
+    )
 
     val discounts: Flow<ResultList<List<Discount>>> =
         discountsFlow.combine(errorStateFlow) { list, errors ->

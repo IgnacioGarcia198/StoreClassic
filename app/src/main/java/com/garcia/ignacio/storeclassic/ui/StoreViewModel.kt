@@ -10,7 +10,7 @@ import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
-import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorType
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
