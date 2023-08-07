@@ -20,8 +20,18 @@
     </plurals>
     <string name="accept">Accept</string>
     <string name="cancel">Cancel</string>
-
-
+    <string name="unimplemented_discounts_user_feedback">Some new discounts are unavailable, please update your application to get them. If after the update the error persists, please contact the developer.</string>
+    <string name="generic_error_user_feedback">An error occurred</string>
+    <string name="products_network_error_user_feedback">There was an error retrieving products from the network.</string>
+    <string name="product_db_write_error_user_feedback">There was an error storing the last products information.</string>
+    <string name="product_db_read_error_user_feedback">There was an error retrieving stored products.</string>
+    <string name="discounts_network_error_user_feedback">There was an error retrieving discounts from the network.</string>
+    <string name="discount_db_write_error_user_feedback">There was an error storing the last discounts information.</string>
+    <string name="discount_db_read_error_user_feedback">There was an error retrieving stored discounts.</string>
+    <string name="error_feedback_report_action">Report</string>
+    <string name="error_feedback_title">Errors occurred:\n%s</string>
+    <string name="error_report_email_title">Error report</string>
+    <string name="error_report_mail_client_chooser_title">Send report via email</string>
 
     <string name="second_fragment_label">Second Fragment</string>
     <string name="previous">Previous</string>

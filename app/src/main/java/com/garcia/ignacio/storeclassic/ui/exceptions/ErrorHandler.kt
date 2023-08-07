@@ -1,17 +1,24 @@
 package com.garcia.ignacio.storeclassic.ui.exceptions
 
+import android.app.Application
 import com.garcia.ignacio.storeclassic.BuildConfig
+import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import javax.inject.Inject
 
-class ErrorHandler @Inject constructor() {
+class ErrorHandler @Inject constructor(
+    private val context: Application
+) {
+    lateinit var errorReporter: ErrorReporter
+    private val reportableErrors = mutableListOf<ReportableError>()
 
     fun handleErrors(
         errors: List<Throwable>,
         errorType: ErrorType,
     ) {
+        if (errors.isEmpty()) return
         when (errorType) {
             ErrorType.PRODUCT ->
                 handleAllErrors(errors)
@@ -20,10 +27,15 @@ class ErrorHandler @Inject constructor() {
                 val (unimplemented, otherErrors) = errors.partition {
                     it is StoreException.UnimplementedDiscount
                 }
-                handleUnimplementedDiscounts(unimplemented)
-                handleAllErrors(otherErrors)
+                if (unimplemented.isNotEmpty()) {
+                    handleUnimplementedDiscounts(unimplemented)
+                }
+                if (otherErrors.isNotEmpty()) {
+                    handleAllErrors(otherErrors)
+                }
             }
         }
+        errorReporter.reportErrors(reportableErrors)
     }
 
     private fun handleAllErrors(errors: List<Throwable>) {
@@ -36,7 +48,15 @@ class ErrorHandler @Inject constructor() {
         unimplemented.map {
             (it as StoreException.UnimplementedDiscount).discount.productCode
         }.groupBy { it }.keys.let {
-            // report unimplemented discount keys
+            val unimplementedDiscountTypes = it.joinToString()
+            val devMessage = "Unimplemented discounts were received: $unimplementedDiscountTypes"
+
+            val errorMessage = if (BuildConfig.DEBUG) {
+                devMessage
+            } else {
+                context.getString(R.string.unimplemented_discounts_user_feedback)
+            }
+            addReportableError(errorMessage, devMessage)
         }
     }
 
@@ -50,6 +70,13 @@ class ErrorHandler @Inject constructor() {
 
             else -> {
                 // report generic error
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "An error occurred: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.generic_error_user_feedback)
+                    }
+                addReportableError(errorMessage, error.stackTraceToString())
             }
         }
     }
@@ -62,7 +89,9 @@ class ErrorHandler @Inject constructor() {
                 handleStageException(error)
 
             is StoreException.Misusing -> {
-                // report to the developers
+                if (BuildConfig.DEBUG) {
+                    throw error
+                }
             }
 
             is StoreException.UnimplementedDiscount -> {
@@ -87,17 +116,94 @@ class ErrorHandler @Inject constructor() {
 
     private fun handleProductStageException(error: StoreException.StageException) {
         when (error.stage) {
-            Stage.CLIENT -> {}
-            Stage.DB_WRITE -> {}
-            Stage.DB_READ -> {}
+            Stage.CLIENT -> {
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "Products client error: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.products_network_error_user_feedback)
+                    }
+                addReportableError(
+                    errorMessage,
+                    "Products client error: ${error.stackTraceToString()}"
+                )
+            }
+
+            Stage.DB_WRITE -> {
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "Products database write error: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.product_db_write_error_user_feedback)
+                    }
+                addReportableError(
+                    errorMessage,
+                    "Products database write error: ${error.stackTraceToString()}"
+                )
+            }
+
+            Stage.DB_READ -> {
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "Products database read error: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.product_db_read_error_user_feedback)
+                    }
+                addReportableError(
+                    errorMessage,
+                    "Products database read error: ${error.stackTraceToString()}"
+                )
+            }
         }
     }
 
     private fun handleDiscountStageException(error: StoreException.StageException) {
         when (error.stage) {
-            Stage.CLIENT -> {}
-            Stage.DB_WRITE -> {}
-            Stage.DB_READ -> {}
+            Stage.CLIENT -> {
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "Discounts client error: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.discounts_network_error_user_feedback)
+                    }
+                addReportableError(
+                    errorMessage,
+                    "Discounts client error: ${error.stackTraceToString()}"
+                )
+            }
+
+            Stage.DB_WRITE -> {
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "Discounts database write error: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.discount_db_write_error_user_feedback)
+                    }
+                addReportableError(
+                    errorMessage,
+                    "Discounts database write error: ${error.stackTraceToString()}"
+                )
+            }
+
+            Stage.DB_READ -> {
+                val errorMessage =
+                    if (BuildConfig.DEBUG) {
+                        "Discounts database read error: ${error.message.orEmpty()}"
+                    } else {
+                        context.getString(R.string.discount_db_read_error_user_feedback)
+                    }
+                addReportableError(
+                    errorMessage,
+                    "Discounts database read error: ${error.stackTraceToString()}"
+                )
+            }
         }
+    }
+
+    private fun addReportableError(
+        errorMessage: String,
+        reportMessage: String,
+    ) {
+        reportableErrors.add(ReportableError(errorMessage, reportMessage))
     }
 }

@@ -6,5 +6,7 @@
     <color name="add_to_cart_pressed_tint">#f4d03f</color>
     <color name="colorPrimary">#683ECF</color>
     <color name="colorAccent">@color/colorPrimary</color>
-    <color name="addedToCartToast">#00c000</color>
+    <color name="addedToCartFeedbackBackground">#00a000</color>
+    <color name="errorFeedbackBackground">#FF0000</color>
+    <color name="errorFeedbackReportActionColor">#ff9900</color>
 </resources>

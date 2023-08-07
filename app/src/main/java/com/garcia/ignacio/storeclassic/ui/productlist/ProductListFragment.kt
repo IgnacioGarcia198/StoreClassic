@@ -1,6 +1,7 @@
 package com.garcia.ignacio.storeclassic.ui.productlist
 
 import android.content.DialogInterface
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -20,11 +21,15 @@ import com.garcia.ignacio.storeclassic.ui.AddToCart
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.dialog.ConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.dialog.showConfirmationDialog
+import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
 private const val ADD_TO_CART_CONFIRMATION_DIALOG = "AddToCartConfirmation"
+private const val DEVELOPER_EMAIL = "ignaciogarcia198@gmail.com"
+private const val EMAIL_MIME_TYPE = "message/rfc822"
+private const val ERROR_FEEDBACK_MAX_LINES = 10
 
 @AndroidEntryPoint
 class ProductListFragment : Fragment() {
@@ -117,10 +122,51 @@ class ProductListFragment : Fragment() {
                 // NOP
             }
 
-            is StoreViewModel.Effect.AddToCartConfirmed -> {
+            is StoreViewModel.Effect.AddToCartConfirmed ->
                 showAddedToCartFeedback(effect.addToCart)
-            }
+
+            is StoreViewModel.Effect.ReportErrors ->
+                showErrorsFeedback(effect.compoundError)
         }
+    }
+
+    private fun showErrorsFeedback(compoundError: ReportableError) {
+        Snackbar.make(
+            requireView(),
+            getString(R.string.error_feedback_title, compoundError.errorMessage),
+            Snackbar.LENGTH_LONG
+        ).setAction(getString(R.string.error_feedback_report_action)) {
+            reportError(compoundError)
+        }.setActionTextColor(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.errorFeedbackReportActionColor
+            )
+        ).setTextColor(
+            ContextCompat.getColor(requireContext(), R.color.white)
+        ).setBackgroundTint(
+            ContextCompat.getColor(
+                requireContext(),
+                R.color.errorFeedbackBackground
+            )
+        ).setTextMaxLines(
+            ERROR_FEEDBACK_MAX_LINES
+        ).show()
+    }
+
+    private fun reportError(compoundError: ReportableError) {
+        val email = Intent(Intent.ACTION_SEND)
+        email.putExtra(Intent.EXTRA_EMAIL, arrayOf(DEVELOPER_EMAIL))
+        email.putExtra(Intent.EXTRA_SUBJECT, getString(R.string.error_report_email_title))
+        email.putExtra(Intent.EXTRA_TEXT, compoundError.reportMessage)
+        email.type = EMAIL_MIME_TYPE
+
+        startActivity(
+            Intent.createChooser(
+                email,
+                getString(R.string.error_report_mail_client_chooser_title)
+            )
+        )
     }
 
     private fun showAddedToCartFeedback(addToCart: AddToCart) {
@@ -133,8 +179,12 @@ class ProductListFragment : Fragment() {
         val feedbackHtml = HtmlCompat.fromHtml(feedbackText, HtmlCompat.FROM_HTML_MODE_COMPACT)
         Snackbar.make(requireView(), feedbackHtml, Snackbar.LENGTH_SHORT)
             .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
-            .setBackgroundTint(ContextCompat.getColor(requireContext(), R.color.addedToCartToast))
-            .show()
+            .setBackgroundTint(
+                ContextCompat.getColor(
+                    requireContext(),
+                    R.color.addedToCartFeedbackBackground
+                )
+            ).show()
     }
 
     private fun hideLoading() {
