@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui
+package com.garcia.ignacio.storeclassic.ui.checkout
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
