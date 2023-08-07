@@ -10,6 +10,7 @@ import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import java.text.DecimalFormat
 
 private const val PRICE_FORMAT = "0.#"
+private const val ADD_TO_CART_AT_ONCE_LIMIT = 10
 
 class ProductViewHolder(
     private val binding: ProductListItemBinding,
@@ -21,7 +22,7 @@ class ProductViewHolder(
         ArrayAdapter(
             itemView.context,
             android.R.layout.simple_spinner_item,
-            (1..10).toMutableList()
+            (1..ADD_TO_CART_AT_ONCE_LIMIT).toMutableList()
         ).also { adapter ->
             adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item)
             binding.addToCart.adapter = adapter
@@ -29,6 +30,9 @@ class ProductViewHolder(
     }
 
     fun bind(product: Product) {
+        binding.seeDiscounts.visibility =
+            if (viewModel.hasDiscounts(product)) View.VISIBLE
+            else View.INVISIBLE
         binding.seeDiscounts.setOnClickListener { println("discounts clicked") }
         binding.addToCart.setSelection(binding.addToCart.selectedItemPosition, false)
         binding.addToCart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
