@@ -9,6 +9,7 @@ import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResult
+import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 
 private const val ARG_TAG = "dialogTag"
 private const val ARG_TITLE = "title"
@@ -19,7 +20,7 @@ private const val ARG_NEUTRAL_TEXT = "neutral"
 
 class ConfirmationDialog : DialogFragment(), DialogInterface.OnClickListener {
     private val dialogTag: String by lazy {
-        arguments?.getString(ARG_TAG) ?: error("tag argument needed")
+        arguments?.getString(ARG_TAG) ?: throw StoreException.Misusing("tag argument needed")
     }
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {

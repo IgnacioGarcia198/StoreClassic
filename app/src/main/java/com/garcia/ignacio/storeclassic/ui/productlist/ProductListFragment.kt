@@ -11,7 +11,9 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.setFragmentResultListener
 import androidx.fragment.app.viewModels
+import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
+import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.AddToCart
@@ -50,7 +52,10 @@ class ProductListFragment : Fragment() {
             DialogInterface.BUTTON_NEGATIVE,
             ConfirmationDialog.CANCELLED -> addToCartCancelled()
 
-            else -> error("unexpected result: $addToCartConfirmationResult")
+            else ->
+                if (BuildConfig.DEBUG) {
+                    throw StoreException.Misusing("unexpected result: $addToCartConfirmationResult")
+                }
         }
     }
 

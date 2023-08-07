@@ -1,5 +1,6 @@
 package com.garcia.ignacio.storeclassic.ui.exceptions
 
+import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
@@ -65,7 +66,9 @@ class ErrorHandler @Inject constructor() {
             }
 
             is StoreException.UnimplementedDiscount -> {
-                // already handled
+                if (BuildConfig.DEBUG) {
+                    throw StoreException.Misusing("UnimplementedDiscount not available for Product")
+                }
             }
         }
     }
