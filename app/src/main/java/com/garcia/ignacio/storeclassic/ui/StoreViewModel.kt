@@ -14,6 +14,7 @@ import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
+import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine

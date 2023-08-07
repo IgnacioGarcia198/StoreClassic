@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui
+package com.garcia.ignacio.storeclassic.ui.model
 
 import com.garcia.ignacio.storeclassic.domain.models.Product
 
