@@ -7,23 +7,24 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.core.content.ContextCompat
+import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
-import androidx.fragment.app.viewModels
-import androidx.navigation.navGraphViewModels
+import androidx.navigation.fragment.findNavController
 import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.dialog.ConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.dialog.showConfirmationDialog
+import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountsDialog
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
+import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -129,7 +130,20 @@ class ProductListFragment : Fragment() {
 
             is StoreViewModel.Effect.ReportErrors ->
                 showErrorsFeedback(effect.compoundError)
+
+            is StoreViewModel.Effect.DisplayDiscounts ->
+                displayDiscountsForProduct(effect.product)
         }
+    }
+
+    private fun displayDiscountsForProduct(product: Product) {
+        findNavController().navigate(
+            R.id.action_ProductsFragment_to_discountsDialog,
+            bundleOf(
+                DiscountsDialog.ARG_PRODUCT_CODE to product.code,
+                DiscountsDialog.ARG_PRODUCT_NAME to product.name,
+            )
+        )
     }
 
     private fun showErrorsFeedback(compoundError: ReportableError) {

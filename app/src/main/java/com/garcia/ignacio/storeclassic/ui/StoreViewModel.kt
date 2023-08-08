@@ -4,9 +4,7 @@ import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.distinctUntilChanged
 import androidx.lifecycle.map
-import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
@@ -48,15 +46,16 @@ class StoreViewModel @Inject constructor(
     private var discounts = emptyList<Discount>()
 
     val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->
-        when(state) {
+        when (state) {
             is State.Ready ->
                 state.products.mapNotNull { product ->
-                    discounts.find {
-                            discount -> discount.isApplicableTo(product)
+                    discounts.find { discount ->
+                        discount.isApplicableTo(product)
                     }?.let {
-                        DiscountedProduct(product.name, it.expressAsString(context))
+                        DiscountedProduct(product.code, product.name, it.expressAsString(context))
                     }
                 }
+
             else -> emptyList()
         }
     }
@@ -109,11 +108,16 @@ class StoreViewModel @Inject constructor(
         effect.value = Event(Effect.ReportErrors(reportableError))
     }
 
+    fun displayDiscounts(product: Product) {
+        effect.value = Event(Effect.DisplayDiscounts(product))
+    }
+
     sealed interface Effect {
         object Idle : Effect
         object AddToCartConfirmation : Effect
         data class AddToCartConfirmed(val addToCart: AddToCart) : Effect
         data class ReportErrors(val compoundError: ReportableError) : Effect
+        data class DisplayDiscounts(val product: Product) : Effect
     }
 
     sealed interface State {

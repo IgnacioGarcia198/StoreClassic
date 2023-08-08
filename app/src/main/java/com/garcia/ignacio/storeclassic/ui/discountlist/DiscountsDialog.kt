@@ -19,6 +19,8 @@ class DiscountsDialog : DialogFragment() {
     private var _binding: DialogDiscountsBinding? = null
     private val binding get() = _binding!!
     private val viewModel: StoreViewModel by activityViewModels()
+    private val productCode: String? by lazy { arguments?.getString(ARG_PRODUCT_CODE) }
+    private val productName: String? by lazy { arguments?.getString(ARG_PRODUCT_NAME) }
 
     @Inject
     lateinit var discountsAdapter: DiscountsAdapter
@@ -29,7 +31,6 @@ class DiscountsDialog : DialogFragment() {
         )
         _binding = DialogDiscountsBinding.inflate(layoutInflater, null, false)
         builder.setView(binding.root)
-        builder.setTitle(R.string.discounts_dialog_label)
         return builder.create()
     }
 
@@ -43,6 +44,11 @@ class DiscountsDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        dialog?.setTitle(
+            productName
+                ?.let { getString(R.string.discounts_for_chosen_product_title, it) }
+                ?: getString(R.string.discounts_dialog_label)
+        )
 
         initializeRecyclerView()
         observeViewModel()
@@ -53,13 +59,19 @@ class DiscountsDialog : DialogFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.discountedProducts.observe(viewLifecycleOwner) {
-            discountsAdapter.submitList(it)
+        viewModel.discountedProducts.observe(viewLifecycleOwner) { list ->
+            val filteredList = productCode?.let { code -> list.filter { it.productCode == code } } ?: list
+            discountsAdapter.submitList(filteredList)
         }
     }
 
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val ARG_PRODUCT_CODE = "DiscountDialog.productCode"
+        const val ARG_PRODUCT_NAME = "DiscountDialog.productName"
     }
 }

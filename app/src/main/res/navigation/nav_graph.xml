@@ -3,19 +3,19 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/FirstFragment">
+    app:startDestination="@id/ProductsFragment">
 
     <fragment
-        android:id="@+id/FirstFragment"
+        android:id="@+id/ProductsFragment"
         android:name="com.garcia.ignacio.storeclassic.ui.productlist.ProductListFragment"
         android:label="@string/product_list_fragment_label"
         tools:layout="@layout/fragment_product_list">
 
         <action
-            android:id="@+id/action_FirstFragment_to_SecondFragment"
+            android:id="@+id/action_ProductsFragment_to_CheckoutFragment"
             app:destination="@id/CheckoutFragment" />
         <action
-            android:id="@+id/action_FirstFragment_to_discountsDialog"
+            android:id="@+id/action_ProductsFragment_to_discountsDialog"
             app:destination="@id/discountsDialog" />
     </fragment>
     <fragment
@@ -25,8 +25,8 @@
         tools:layout="@layout/fragment_checkout">
 
         <action
-            android:id="@+id/action_SecondFragment_to_FirstFragment"
-            app:destination="@id/FirstFragment" />
+            android:id="@+id/action_CheckoutFragment_to_ProductsFragment"
+            app:destination="@id/ProductsFragment" />
         <action
             android:id="@+id/action_CheckoutFragment_to_discountsDialog"
             app:destination="@id/discountsDialog" />
@@ -35,5 +35,12 @@
         android:id="@+id/discountsDialog"
         android:name="com.garcia.ignacio.storeclassic.ui.discountlist.DiscountsDialog"
         android:label="@string/discounts_dialog_label"
-        tools:layout="@layout/dialog_discounts" />
+        tools:layout="@layout/dialog_discounts" >
+        <argument
+            android:name="DiscountDialog.productCode"
+            app:argType="string" />
+        <argument
+            android:name="DiscountDialog.productName"
+            app:argType="string" />
+    </dialog>
 </navigation>

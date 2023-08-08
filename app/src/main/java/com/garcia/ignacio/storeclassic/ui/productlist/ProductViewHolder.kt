@@ -33,7 +33,9 @@ class ProductViewHolder(
         binding.seeDiscounts.visibility =
             if (viewModel.hasDiscounts(product)) View.VISIBLE
             else View.INVISIBLE
-        binding.seeDiscounts.setOnClickListener { println("discounts clicked") }
+        binding.seeDiscounts.setOnClickListener {
+            viewModel.displayDiscounts(product)
+        }
         binding.addToCart.setSelection(binding.addToCart.selectedItemPosition, false)
         binding.addToCart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
             override fun onItemSelected(

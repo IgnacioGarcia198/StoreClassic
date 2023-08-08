@@ -14,6 +14,7 @@
     <string name="discount">Discount</string>
     <string name="discounts">Discounts</string>
     <string name="discounts_dialog_label">Current discounts</string>
+    <string name="discounts_for_chosen_product_title">%s discounts</string>
 
     <!-- Add to cart -->
     <string name="add_to_cart">Add to cart</string>
