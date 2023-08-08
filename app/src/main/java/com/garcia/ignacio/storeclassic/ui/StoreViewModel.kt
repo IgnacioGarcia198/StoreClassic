@@ -1,8 +1,12 @@
 package com.garcia.ignacio.storeclassic.ui
 
+import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.distinctUntilChanged
+import androidx.lifecycle.map
+import androidx.lifecycle.switchMap
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
@@ -10,9 +14,11 @@ import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
+import com.garcia.ignacio.storeclassic.ui.extensions.expressAsString
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -30,6 +36,7 @@ class StoreViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
     private val discountsRepository: DiscountsRepository,
     private val errorHandler: ErrorHandler,
+    private val context: Application
 ) : ViewModel(), ErrorReporter {
     private val state = MutableLiveData<State>(State.Loading)
     fun getState(): LiveData<State> = state
@@ -39,6 +46,20 @@ class StoreViewModel @Inject constructor(
     fun getEffect(): LiveData<Event<Effect>> = effect
 
     private var discounts = emptyList<Discount>()
+
+    val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->
+        when(state) {
+            is State.Ready ->
+                state.products.mapNotNull { product ->
+                    discounts.find {
+                            discount -> discount.isApplicableTo(product)
+                    }?.let {
+                        DiscountedProduct(product.name, it.expressAsString(context))
+                    }
+                }
+            else -> emptyList()
+        }
+    }
 
     init {
         errorHandler.errorReporter = this

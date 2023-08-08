@@ -13,16 +13,27 @@
 
         <action
             android:id="@+id/action_FirstFragment_to_SecondFragment"
-            app:destination="@id/SecondFragment" />
+            app:destination="@id/CheckoutFragment" />
+        <action
+            android:id="@+id/action_FirstFragment_to_discountsDialog"
+            app:destination="@id/discountsDialog" />
     </fragment>
     <fragment
-        android:id="@+id/SecondFragment"
+        android:id="@+id/CheckoutFragment"
         android:name="com.garcia.ignacio.storeclassic.ui.checkout.CheckoutFragment"
-        android:label="@string/second_fragment_label"
-        tools:layout="@layout/fragment_second">
+        android:label="@string/checkout_fragment_label"
+        tools:layout="@layout/fragment_checkout">
 
         <action
             android:id="@+id/action_SecondFragment_to_FirstFragment"
             app:destination="@id/FirstFragment" />
+        <action
+            android:id="@+id/action_CheckoutFragment_to_discountsDialog"
+            app:destination="@id/discountsDialog" />
     </fragment>
+    <dialog
+        android:id="@+id/discountsDialog"
+        android:name="com.garcia.ignacio.storeclassic.ui.discountlist.DiscountsDialog"
+        android:label="@string/discounts_dialog_label"
+        tools:layout="@layout/dialog_discounts" />
 </navigation>

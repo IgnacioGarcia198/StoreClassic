@@ -14,7 +14,7 @@ private const val ADD_TO_CART_AT_ONCE_LIMIT = 10
 
 class ProductViewHolder(
     private val binding: ProductListItemBinding,
-    private val viewModel: StoreViewModel
+    private val viewModel: StoreViewModel,
 ) : RecyclerView.ViewHolder(binding.root) {
     private val priceFormatter = DecimalFormat(PRICE_FORMAT)
 

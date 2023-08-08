@@ -7,6 +7,14 @@
     <string name="retrieving_products">Retrieving products…</string>
     <string name="no_products_available">No products available.</string>
 
+    <!-- Store Discount List -->
+    <string name="retrieving_discounts">Retrieving discounts…</string>
+    <string name="no_discounts_available">No discounts available.</string>
+    <string name="product">Product</string>
+    <string name="discount">Discount</string>
+    <string name="discounts">Discounts</string>
+    <string name="discounts_dialog_label">Current discounts</string>
+
     <!-- Add to cart -->
     <string name="add_to_cart">Add to cart</string>
     <string name="add_to_cart_confirmation_title">Add products to cart</string>
@@ -32,7 +40,10 @@
     <string name="error_feedback_title">Errors occurred:\n%s</string>
     <string name="error_report_email_title">Error report</string>
     <string name="error_report_mail_client_chooser_title">Send report via email</string>
+    <string name="x_for_y_discount">Buy %1$d and pay %2$d</string>
+    <string name="buy_in_bulk_discount">Discount of %1$s%% when buying at least %2$d</string>
+    <string name="unimplemented_discount_not_available">Not available</string>
 
-    <string name="second_fragment_label">Second Fragment</string>
+    <string name="checkout_fragment_label">Checkout</string>
     <string name="previous">Previous</string>
 </resources>
