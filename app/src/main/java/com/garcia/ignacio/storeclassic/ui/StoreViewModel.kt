@@ -7,6 +7,7 @@ import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
+import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
@@ -21,6 +22,7 @@ import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
@@ -36,6 +38,7 @@ class StoreViewModel @Inject constructor(
     private val discountsRepository: DiscountsRepository,
     private val errorHandler: ErrorHandler,
     private val helper: StoreViewModelHelper,
+    private val connectivityMonitor: ConnectivityMonitor,
 ) : ViewModel(), ErrorReporter {
     private val productsState = MutableLiveData<ProductsState>(ProductsState.Loading)
     fun getProductsState(): LiveData<ProductsState> = productsState
@@ -53,6 +56,8 @@ class StoreViewModel @Inject constructor(
     val checkoutData: LiveData<List<CheckoutRow>> by lazy {
         helper.getCheckoutData(cart, discounts, viewModelScope)
     }
+    private var isConnectionAvailable = true
+    private var updateJob: Job? = null
 
     fun getDiscountsForProduct(productCode: String? = null): LiveData<List<DiscountedProduct>> =
         discountedProducts.map { list ->
@@ -65,9 +70,26 @@ class StoreViewModel @Inject constructor(
 
     init {
         errorHandler.errorReporter = this
-        getRepositoryDiscounts().combine(
+        updateDataFromNetwork()
+        startMonitoringNetworkConnection()
+    }
+
+    private fun updateDataFromNetwork() {
+        productsState.value = ProductsState.Loading
+        updateJob?.cancel()
+        updateJob = getRepositoryDiscounts().combine(
             getRepositoryProducts()
         ) { _, _ -> }.launchIn(viewModelScope)
+    }
+
+    private fun startMonitoringNetworkConnection() {
+        connectivityMonitor.isNetworkConnectedFlow
+            .onEach { connectionAvailable ->
+                if (!isConnectionAvailable && connectionAvailable) {
+                    updateDataFromNetwork()
+                }
+                isConnectionAvailable = connectionAvailable
+            }.launchIn(viewModelScope)
     }
 
     private fun getRepositoryProducts(): Flow<ResultList<List<Product>>> =

@@ -49,7 +49,6 @@ class ProductListFragment : Fragment() {
         setFragmentResultListener(
             ADD_TO_CART_CONFIRMATION_DIALOG
         ) { _, bundle ->
-            println("RESULT: ${bundle.getInt(ConfirmationDialog.RESULT_KEY)}")
             val addToCartConfirmationResult = bundle.getInt(ConfirmationDialog.RESULT_KEY)
             processAddToCartConfirmationResult(addToCartConfirmationResult)
         }
