@@ -49,6 +49,7 @@ class ProductListFragment : Fragment() {
         setFragmentResultListener(
             ADD_TO_CART_CONFIRMATION_DIALOG
         ) { _, bundle ->
+            println("RESULT: ${bundle.getInt(ConfirmationDialog.RESULT_KEY)}")
             val addToCartConfirmationResult = bundle.getInt(ConfirmationDialog.RESULT_KEY)
             processAddToCartConfirmationResult(addToCartConfirmationResult)
         }
@@ -87,6 +88,9 @@ class ProductListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeRecyclerView()
         observeViewModel()
+        binding.checkoutFab.setOnClickListener {
+            findNavController().navigate(R.id.action_ProductsFragment_to_CheckoutFragment)
+        }
     }
 
     private fun observeViewModel() {

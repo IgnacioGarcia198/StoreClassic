@@ -12,6 +12,9 @@ import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
+import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
+import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
@@ -44,6 +47,30 @@ class StoreViewModel @Inject constructor(
     fun getEffect(): LiveData<Event<Effect>> = effect
 
     private var discounts = emptyList<Discount>()
+    private val cart = mutableListOf<Product>()
+
+    fun getCheckoutRows(): LiveData<List<CheckoutRow>> {
+        val rows = mutableListOf<CheckoutRow>()
+        cart.groupBy { it.code }.values.forEach { productGroup ->
+            val discount = discounts.find {
+                it.productCode == productGroup.first().code
+            } ?: let {
+                rows.add(NonDiscountedCheckoutRow(productGroup, productGroup.sumOf { it.price }))
+                return@forEach
+            }
+            val (applicable, nonApplicable) = discount.partitionApplicableProducts(productGroup)
+            val discountedAmount = discount.apply(applicable)
+            val discountedPercent =
+                if (applicable.isEmpty()) 0.0 else discountedAmount / applicable.sumOf { it.price } * 100
+            rows.add(
+                DiscountedCheckoutRow(applicable, discount, discountedAmount, discountedPercent)
+            )
+            rows.add(
+                NonDiscountedCheckoutRow(nonApplicable, nonApplicable.sumOf { it.price })
+            )
+        }
+        return MutableLiveData(rows)
+    }
 
     val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->
         when (state) {
@@ -90,8 +117,11 @@ class StoreViewModel @Inject constructor(
     }
 
     fun pendingAddToCartConfirmed() {
-        pendingAddToCart?.let {
-            effect.value = Event(Effect.AddToCartConfirmed(it))
+        pendingAddToCart?.let { addToCart ->
+            repeat(addToCart.quantity) {
+                cart.add(addToCart.product)
+            }
+            effect.value = Event(Effect.AddToCartConfirmed(addToCart))
             pendingAddToCart = null
         }
     }

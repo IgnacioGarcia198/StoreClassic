@@ -6,6 +6,7 @@
     <string name="euro_currency_format" translatable="false">%s €</string>
     <string name="retrieving_products">Retrieving products…</string>
     <string name="no_products_available">No products available.</string>
+    <string name="checkout_action">Checkout</string>
 
     <!-- Store Discount List -->
     <string name="retrieving_discounts">Retrieving discounts…</string>
@@ -45,6 +46,7 @@
     <string name="buy_in_bulk_discount">Discount of %1$s%% when buying at least %2$d</string>
     <string name="unimplemented_discount_not_available">Not available</string>
 
+    <!-- Checkout -->
     <string name="checkout_fragment_label">Checkout</string>
-    <string name="previous">Previous</string>
+    <string name="checkout_list_empty_cart_message">Shopping cart is empty.</string>
 </resources>
