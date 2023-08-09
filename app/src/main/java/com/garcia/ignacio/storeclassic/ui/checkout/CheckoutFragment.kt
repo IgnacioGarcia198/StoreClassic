@@ -47,7 +47,9 @@ class CheckoutFragment : Fragment() {
             val emptyCart = checkoutRows.isEmpty()
             binding.checkoutGroup.isVisible = !emptyCart
             binding.emptyCartText.isVisible = emptyCart
-            adapter.submitList(checkoutRows)
+            if (!emptyCart) {
+                adapter.submitList(checkoutRows)
+            }
         }
     }
 
