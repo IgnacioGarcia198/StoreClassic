@@ -89,14 +89,17 @@ class StoreViewModel @Inject constructor(
             }
         }
         val checkoutRows = discountedRows + nonDiscountedRows
-        val totalAmount = checkoutRows.sumOf { it.amount }
-        val originalAmount = cart.sumOf { it.price }
-        val totalRow = TotalCheckoutRow(
-            quantity = cart.size,
-            amount = totalAmount,
-            discountedPercent = (1 - totalAmount / originalAmount) * 100
-        )
-        return discountedRows + nonDiscountedRows + totalRow
+        return if (checkoutRows.isEmpty()) checkoutRows
+        else {
+            val totalAmount = checkoutRows.sumOf { it.amount }
+            val originalAmount = cart.sumOf { it.price }
+            val totalRow = TotalCheckoutRow(
+                quantity = cart.size,
+                amount = totalAmount,
+                discountedPercent = (1 - totalAmount / originalAmount) * 100
+            )
+            checkoutRows + totalRow
+        }
     }
 
     val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->
