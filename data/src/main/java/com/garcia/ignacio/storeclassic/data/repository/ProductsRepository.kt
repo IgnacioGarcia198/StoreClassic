@@ -5,6 +5,7 @@ import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
+import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import kotlinx.coroutines.Dispatchers
@@ -22,6 +23,7 @@ import javax.inject.Inject
 class ProductsRepository @Inject constructor(
     storeClient: StoreClient,
     private val localDataStore: ProductsLocalDataStore,
+    private val connectivityMonitor: ConnectivityMonitor,
 ) {
     private val errorStateFlow = MutableStateFlow(mutableListOf<Throwable>())
 
@@ -29,7 +31,10 @@ class ProductsRepository @Inject constructor(
         storeClient.getProducts().onEach {
             errorStateFlow.value.clear()
         }.catch {
-            errorStateFlow.value = mutableListOf(stageException(Stage.CLIENT, it))
+            val exception =
+                if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
+                else StoreException.DeviceOffline(it)
+            errorStateFlow.value = mutableListOf(exception)
             emit(emptyList())
         }.onEach {
             if (it.isNotEmpty()) localDataStore.updateProducts(it)

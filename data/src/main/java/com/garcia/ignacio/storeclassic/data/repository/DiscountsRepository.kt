@@ -6,6 +6,7 @@ import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException.UnimplementedDiscount
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
+import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import kotlinx.coroutines.Dispatchers
@@ -23,6 +24,7 @@ import javax.inject.Inject
 class DiscountsRepository @Inject constructor(
     storeClient: StoreClient,
     private val localDataStore: DiscountsLocalDataStore,
+    private val connectivityMonitor: ConnectivityMonitor,
 ) {
     private val errorStateFlow = MutableStateFlow(mutableListOf<Throwable>())
 
@@ -30,7 +32,10 @@ class DiscountsRepository @Inject constructor(
         storeClient.getDiscounts().onEach {
             errorStateFlow.value.clear()
         }.catch {
-            errorStateFlow.value = mutableListOf(stageException(Stage.CLIENT, it))
+            val exception =
+                if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
+                else StoreException.DeviceOffline(it)
+            errorStateFlow.value = mutableListOf(exception)
             emit(emptyList())
         }.onEach { discounts ->
             val (unimplemented, valid) = discounts.partition { it is Discount.Unimplemented }
