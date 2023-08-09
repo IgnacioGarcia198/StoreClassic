@@ -19,6 +19,7 @@ import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
+import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -45,7 +46,9 @@ class StoreViewModel @Inject constructor(
     var pendingAddToCart: AddToCart? = null
         private set
     private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
+    private val appEffect = MutableLiveData<Event<AppEffect>>(Event(AppEffect.Idle))
     fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
+    fun getAppEffect(): LiveData<Event<AppEffect>> = appEffect
 
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
@@ -86,6 +89,7 @@ class StoreViewModel @Inject constructor(
         connectivityMonitor.isNetworkConnectedFlow
             .onEach { connectionAvailable ->
                 if (!isConnectionAvailable && connectionAvailable) {
+                    appEffect.value = Event(AppEffect.ConnectionRestored)
                     updateDataFromNetwork()
                 }
                 isConnectionAvailable = connectionAvailable
@@ -132,7 +136,7 @@ class StoreViewModel @Inject constructor(
             prefix = ERROR_REPORT_HEADER // TODO: Here we can add info on the device and OS
         ) { it.reportMessage }
         val reportableError = ReportableError(message, report)
-        productsEffect.value = Event(ProductsEffect.ReportErrors(reportableError))
+        appEffect.value = Event(AppEffect.ReportErrors(reportableError))
     }
 
     fun displayDiscounts(product: Product) {
