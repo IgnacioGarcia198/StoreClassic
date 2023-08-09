@@ -47,43 +47,44 @@ class StoreViewModel @Inject constructor(
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
 
-    val discountedProducts: LiveData<List<DiscountedProduct>>
-        get() {
-            val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
-            var productsState: ProductsState = ProductsState.Loading
-            var discountsList: List<Discount> = emptyList()
+    val discountedProducts: LiveData<List<DiscountedProduct>> by lazy { discountedProducts() }
+    val checkoutData: LiveData<List<CheckoutRow>> by lazy { checkoutData() }
 
-            mediator.addSource(this.productsState) {
-                productsState = it
-                helper.updateDiscountedProducts(
-                    productsState, discountsList, viewModelScope, mediator
-                )
-            }
-            mediator.addSource(discounts) {
-                discountsList = it
-                helper.updateDiscountedProducts(
-                    productsState, discountsList, viewModelScope, mediator
-                )
-            }
-            return mediator
+    private fun discountedProducts(): MediatorLiveData<List<DiscountedProduct>> {
+        val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
+        var productsState: ProductsState = ProductsState.Loading
+        var discountsList: List<Discount> = emptyList()
+
+        mediator.addSource(this.productsState) {
+            productsState = it
+            helper.updateDiscountedProducts(
+                productsState, discountsList, viewModelScope, mediator
+            )
         }
-
-    val checkoutData: LiveData<List<CheckoutRow>>
-        get() {
-            val mediator = MediatorLiveData(emptyList<CheckoutRow>())
-            var discountsList: List<Discount> = emptyList()
-            var cartList: List<Product> = emptyList()
-
-            mediator.addSource(cart) {
-                cartList = it
-                helper.computeCheckoutData(cartList, discountsList, viewModelScope, mediator)
-            }
-            mediator.addSource(discounts) {
-                discountsList = it
-                helper.computeCheckoutData(cartList, discountsList, viewModelScope, mediator)
-            }
-            return mediator
+        mediator.addSource(discounts) {
+            discountsList = it
+            helper.updateDiscountedProducts(
+                productsState, discountsList, viewModelScope, mediator
+            )
         }
+        return mediator
+    }
+
+    private fun checkoutData(): MediatorLiveData<List<CheckoutRow>> {
+        val mediator = MediatorLiveData(emptyList<CheckoutRow>())
+        var discountsList: List<Discount> = emptyList()
+        var cartList: List<Product> = emptyList()
+
+        mediator.addSource(cart) {
+            cartList = it
+            helper.computeCheckoutData(cartList, discountsList, viewModelScope, mediator)
+        }
+        mediator.addSource(discounts) {
+            discountsList = it
+            helper.computeCheckoutData(cartList, discountsList, viewModelScope, mediator)
+        }
+        return mediator
+    }
 
     fun clearCart() {
         cart.value = mutableListOf()
