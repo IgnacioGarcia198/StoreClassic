@@ -18,6 +18,8 @@ import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
+import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
+import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
@@ -142,16 +144,4 @@ class StoreViewModel @Inject constructor(
         productsEffect.value = Event(ProductsEffect.DisplayDiscounts(product))
     }
 
-    sealed interface ProductsEffect {
-        object Idle : ProductsEffect
-        object AddToCartConfirmation : ProductsEffect
-        data class AddToCartConfirmed(val addToCart: AddToCart) : ProductsEffect
-        data class ReportErrors(val compoundError: ReportableError) : ProductsEffect
-        data class DisplayDiscounts(val product: Product) : ProductsEffect
-    }
-
-    sealed interface ProductsState {
-        object Loading : ProductsState
-        data class Ready(val products: List<Product>) : ProductsState
-    }
 }

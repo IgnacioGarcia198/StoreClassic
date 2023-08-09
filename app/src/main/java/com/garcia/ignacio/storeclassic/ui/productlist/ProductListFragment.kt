@@ -104,13 +104,13 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun renderState(state: StoreViewModel.ProductsState) {
+    private fun renderState(state: ProductsState) {
         when (state) {
-            StoreViewModel.ProductsState.Loading -> {
+            ProductsState.Loading -> {
                 showLoading()
             }
 
-            is StoreViewModel.ProductsState.Ready -> {
+            is ProductsState.Ready -> {
                 hideLoading()
                 productsAdapter.submitList(state.products)
                 binding.noProductsText.isVisible = state.products.isEmpty()
@@ -118,24 +118,24 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun renderEffect(effect: StoreViewModel.ProductsEffect) {
+    private fun renderEffect(effect: ProductsEffect) {
         when (effect) {
-            StoreViewModel.ProductsEffect.AddToCartConfirmation ->
+            ProductsEffect.AddToCartConfirmation ->
                 viewModel.pendingAddToCart?.let {
                     showAddToCartConfirmationDialog(it.product, it.quantity)
                 }
 
-            StoreViewModel.ProductsEffect.Idle -> {
+            ProductsEffect.Idle -> {
                 // NOP
             }
 
-            is StoreViewModel.ProductsEffect.AddToCartConfirmed ->
+            is ProductsEffect.AddToCartConfirmed ->
                 showAddedToCartFeedback(effect.addToCart)
 
-            is StoreViewModel.ProductsEffect.ReportErrors ->
+            is ProductsEffect.ReportErrors ->
                 showErrorsFeedback(effect.compoundError)
 
-            is StoreViewModel.ProductsEffect.DisplayDiscounts ->
+            is ProductsEffect.DisplayDiscounts ->
                 displayDiscountsForProduct(effect.product)
         }
     }

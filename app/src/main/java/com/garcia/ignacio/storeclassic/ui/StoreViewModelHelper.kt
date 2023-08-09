@@ -8,6 +8,7 @@ import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.TotalCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
+import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -17,7 +18,7 @@ import javax.inject.Inject
 class StoreViewModelHelper @Inject constructor() {
 
     fun updateDiscountedProducts(
-        state: StoreViewModel.ProductsState,
+        state: ProductsState,
         discounts: List<Discount>,
         scope: CoroutineScope,
         liveData: MutableLiveData<List<DiscountedProduct>>,
@@ -87,11 +88,11 @@ class StoreViewModelHelper @Inject constructor() {
     }
 
     private suspend fun findDiscountedProducts(
-        state: StoreViewModel.ProductsState,
+        state: ProductsState,
         discounts: List<Discount>
     ): List<DiscountedProduct> = withContext(Dispatchers.Default) {
         when (state) {
-            is StoreViewModel.ProductsState.Ready ->
+            is ProductsState.Ready ->
                 state.products.mapNotNull { product ->
                     discounts.find { discount ->
                         discount.isApplicableTo(product)
