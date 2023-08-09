@@ -42,7 +42,7 @@ class StoreViewModel @Inject constructor(
     var pendingAddToCart: AddToCart? = null
         private set
     private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
-    fun getEffect(): LiveData<Event<ProductsEffect>> = productsEffect
+    fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
 
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())

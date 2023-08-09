@@ -97,7 +97,7 @@ class ProductListFragment : Fragment() {
         viewModel.getProductsState().observe(viewLifecycleOwner) {
             renderState(it)
         }
-        viewModel.getEffect().observe(viewLifecycleOwner) { event ->
+        viewModel.getProductsEffect().observe(viewLifecycleOwner) { event ->
             event.getContentIfNotHandled()?.let {
                 renderEffect(it)
             }
