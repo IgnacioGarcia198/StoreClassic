@@ -13,55 +13,55 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:text="@string/checkout_header_product"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/productPrice"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/checkout_header_product" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/productPrice"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:text="@string/checkout_header_price"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/productQuantity"
         app:layout_constraintStart_toEndOf="@id/productName"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/checkout_header_price" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/productQuantity"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:text="@string/checkout_header_quantity"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/amount"
         app:layout_constraintStart_toEndOf="@id/productPrice"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/checkout_header_quantity" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/amount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:text="@string/checkout_header_amount"
         android:textStyle="bold"
         app:layout_constraintEnd_toStartOf="@id/discount"
         app:layout_constraintStart_toEndOf="@id/productQuantity"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/checkout_header_amount" />
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/discount"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:gravity="center_horizontal"
+        android:text="@string/checkout_header_discount"
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/amount"
-        app:layout_constraintTop_toTopOf="parent"
-        android:text="@string/checkout_header_discount" />
+        app:layout_constraintTop_toTopOf="parent" />
     <!-- CHECKOUT HEADER END -->
 
     <androidx.recyclerview.widget.RecyclerView
@@ -71,23 +71,16 @@
         android:layout_marginTop="16dp"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-        app:layout_constraintBottom_toTopOf="@id/totals"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintTop_toBottomOf="@id/productName"
         tools:listitem="@layout/checkout_item" />
-
-    <include
-        android:id="@+id/totals"
-        layout="@layout/checkout_item"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent" />
 
     <androidx.constraintlayout.widget.Group
         android:id="@+id/checkoutGroup"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:visibility="visible"
-        app:constraint_referenced_ids="productName, productPrice, productQuantity, amount, discount, discount, totals" />
+        app:constraint_referenced_ids="productName, productPrice, productQuantity, amount, discount, discount" />
 
     <TextView
         android:id="@+id/emptyCartText"
