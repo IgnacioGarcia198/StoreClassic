@@ -7,16 +7,15 @@ import androidx.recyclerview.widget.RecyclerView
 import com.garcia.ignacio.storeclassic.databinding.ProductListItemBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
-import java.text.DecimalFormat
+import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 
-private const val PRICE_FORMAT = "0.#"
 private const val ADD_TO_CART_AT_ONCE_LIMIT = 10
 
 class ProductViewHolder(
     private val binding: ProductListItemBinding,
     private val viewModel: StoreViewModel,
+    private val formatter: StoreFormatter,
 ) : RecyclerView.ViewHolder(binding.root) {
-    private val priceFormatter = DecimalFormat(PRICE_FORMAT)
 
     init {
         ArrayAdapter(
@@ -52,9 +51,6 @@ class ProductViewHolder(
             }
         }
         binding.productName.text = product.name
-        binding.productPrice.text = itemView.context.getString(
-            com.garcia.ignacio.storeclassic.R.string.euro_currency_format,
-            priceFormatter.format(product.price)
-        )
+        binding.productPrice.text = formatter.formatPrice(product.price)
     }
 }

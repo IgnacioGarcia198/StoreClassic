@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingHorizontal="16dp"
     tools:context=".ui.checkout.CheckoutFragment">
 
     <!-- CHECKOUT HEADER START -->
@@ -16,7 +17,7 @@
         app:layout_constraintEnd_toStartOf="@id/productPrice"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Product" />
+        android:text="@string/checkout_header_product" />
 
     <TextView
         android:id="@+id/productPrice"
@@ -27,7 +28,7 @@
         app:layout_constraintEnd_toStartOf="@id/productQuantity"
         app:layout_constraintStart_toEndOf="@id/productName"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Price" />
+        android:text="@string/checkout_header_price" />
 
     <TextView
         android:id="@+id/productQuantity"
@@ -38,7 +39,7 @@
         app:layout_constraintEnd_toStartOf="@id/amount"
         app:layout_constraintStart_toEndOf="@id/productPrice"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Quantity" />
+        android:text="@string/checkout_header_quantity" />
 
     <TextView
         android:id="@+id/amount"
@@ -49,7 +50,7 @@
         app:layout_constraintEnd_toStartOf="@id/discount"
         app:layout_constraintStart_toEndOf="@id/productQuantity"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Amount" />
+        android:text="@string/checkout_header_amount" />
 
     <TextView
         android:id="@+id/discount"
@@ -60,13 +61,14 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/amount"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="Discount" />
+        android:text="@string/checkout_header_discount" />
     <!-- CHECKOUT HEADER END -->
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/checkoutList"
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:layout_marginTop="16dp"
         android:scrollbars="vertical"
         app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
         app:layout_constraintBottom_toTopOf="@id/totals"

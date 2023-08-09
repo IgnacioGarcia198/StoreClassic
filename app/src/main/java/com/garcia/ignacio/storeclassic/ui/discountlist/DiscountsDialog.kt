@@ -60,7 +60,8 @@ class DiscountsDialog : DialogFragment() {
 
     private fun observeViewModel() {
         viewModel.discountedProducts.observe(viewLifecycleOwner) { list ->
-            val filteredList = productCode?.let { code -> list.filter { it.productCode == code } } ?: list
+            val filteredList =
+                productCode?.let { code -> list.filter { it.product.code == code } } ?: list
             discountsAdapter.submitList(filteredList)
         }
     }

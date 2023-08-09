@@ -5,10 +5,9 @@ import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.domain.models.Discount
-import java.text.DecimalFormat
+import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 
-private const val PRICE_FORMAT = "0.#"
-private val priceFormatter = DecimalFormat(PRICE_FORMAT)
+private val formatter = StoreFormatter()
 
 fun Discount.expressAsString(context: Context): String =
     when (this) {
@@ -16,7 +15,11 @@ fun Discount.expressAsString(context: Context): String =
             context.getString(R.string.x_for_y_discount, productsBought, productsPaid)
 
         is Discount.BuyInBulk ->
-            context.getString(R.string.buy_in_bulk_discount, priceFormatter.format(discountPercent), minimumBought)
+            context.getString(
+                R.string.buy_in_bulk_discount,
+                formatter.formatPercent(discountPercent),
+                minimumBought
+            )
 
         is Discount.Unimplemented ->
             if (BuildConfig.DEBUG)

@@ -7,11 +7,14 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
+import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
+private const val NO_VALUE = "----"
 @AndroidEntryPoint
 class CheckoutFragment : Fragment() {
 
@@ -21,6 +24,8 @@ class CheckoutFragment : Fragment() {
 
     @Inject
     lateinit var adapter: CheckoutAdapter
+    @Inject
+    lateinit var formatter: StoreFormatter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -43,13 +48,24 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getCheckoutRows().observe(viewLifecycleOwner) { checkoutRows ->
-            val emptyCart = checkoutRows.isEmpty()
-            binding.checkoutGroup.isVisible = !emptyCart
-            binding.emptyCartText.isVisible = emptyCart
-            if (!emptyCart) {
-                adapter.submitList(checkoutRows)
-            }
+        viewModel.getCheckoutData().observe(viewLifecycleOwner) { checkoutData ->
+            renderCheckoutData(checkoutData)
+        }
+        viewModel.computeCheckoutData()
+    }
+
+    private fun renderCheckoutData(checkoutData: CheckoutData) {
+        val emptyCart = checkoutData.checkoutRows.isEmpty()
+        binding.checkoutGroup.isVisible = !emptyCart
+        binding.emptyCartText.isVisible = emptyCart
+        if (!emptyCart) {
+            adapter.submitList(checkoutData.checkoutRows)
+            val totalsBinding = binding.totals
+            totalsBinding.productName.text = getString(R.string.checkout_total)
+            totalsBinding.productPrice.text = NO_VALUE
+            totalsBinding.productQuantity.text = checkoutData.totalQuantity.toString()
+            totalsBinding.amount.text = formatter.formatPrice(checkoutData.totalAmount)
+            totalsBinding.discount.text = formatter.formatPercent(checkoutData.totalDiscount)
         }
     }
 

@@ -7,10 +7,12 @@ import androidx.recyclerview.widget.ListAdapter
 import com.garcia.ignacio.storeclassic.databinding.ProductListItemBinding
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
+import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import javax.inject.Inject
 
-class ProductsAdapter @Inject constructor() :
-    ListAdapter<Product, ProductViewHolder>(ProductDiffCallback()) {
+class ProductsAdapter @Inject constructor(
+    private val formatter: StoreFormatter,
+) : ListAdapter<Product, ProductViewHolder>(ProductDiffCallback()) {
 
     lateinit var viewModel: StoreViewModel
 
@@ -24,7 +26,8 @@ class ProductsAdapter @Inject constructor() :
         )
         return ProductViewHolder(
             binding,
-            viewModel
+            viewModel,
+            formatter
         )
     }
 

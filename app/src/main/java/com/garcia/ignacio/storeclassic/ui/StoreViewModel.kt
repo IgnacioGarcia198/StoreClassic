@@ -1,6 +1,5 @@
 package com.garcia.ignacio.storeclassic.ui
 
-import android.app.Application
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -12,6 +11,7 @@ import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutData
 import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
@@ -19,14 +19,16 @@ import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
-import com.garcia.ignacio.storeclassic.ui.extensions.expressAsString
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 private const val ERROR_REPORT_ITEM_SEPARATOR = "\n====================\n"
@@ -37,7 +39,6 @@ class StoreViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
     private val discountsRepository: DiscountsRepository,
     private val errorHandler: ErrorHandler,
-    private val context: Application
 ) : ViewModel(), ErrorReporter {
     private val state = MutableLiveData<State>(State.Loading)
     fun getState(): LiveData<State> = state
@@ -48,28 +49,54 @@ class StoreViewModel @Inject constructor(
 
     private var discounts = emptyList<Discount>()
     private val cart = mutableListOf<Product>()
+    private val checkoutData = MutableLiveData(CheckoutData())
+    fun getCheckoutData(): LiveData<CheckoutData> = checkoutData
 
-    fun getCheckoutRows(): LiveData<List<CheckoutRow>> {
-        val rows = mutableListOf<CheckoutRow>()
+    fun computeCheckoutData() {
+        viewModelScope.launch {
+            withContext(Dispatchers.Default) {
+                computeCheckoutRowsSuspend()
+            }.also { checkoutData.value = it }
+        }
+    }
+
+    private fun computeCheckoutRowsSuspend(): CheckoutData {
+        val discountedRows = mutableListOf<CheckoutRow>()
+        val nonDiscountedRows = mutableListOf<CheckoutRow>()
         cart.groupBy { it.code }.values.forEach { productGroup ->
             val discount = discounts.find {
                 it.productCode == productGroup.first().code
             } ?: let {
-                rows.add(NonDiscountedCheckoutRow(productGroup, productGroup.sumOf { it.price }))
+                nonDiscountedRows.add(
+                    NonDiscountedCheckoutRow(
+                        productGroup,
+                        productGroup.sumOf { it.price })
+                )
                 return@forEach
             }
             val (applicable, nonApplicable) = discount.partitionApplicableProducts(productGroup)
-            val discountedAmount = discount.apply(applicable)
-            val discountedPercent =
-                if (applicable.isEmpty()) 0.0 else discountedAmount / applicable.sumOf { it.price } * 100
-            rows.add(
-                DiscountedCheckoutRow(applicable, discount, discountedAmount, discountedPercent)
-            )
-            rows.add(
-                NonDiscountedCheckoutRow(nonApplicable, nonApplicable.sumOf { it.price })
-            )
+            if (applicable.isNotEmpty()) {
+                val discountedAmount = discount.apply(applicable)
+                val discountedPercent = (1 - discountedAmount / applicable.sumOf { it.price }) * 100
+                discountedRows.add(
+                    DiscountedCheckoutRow(applicable, discount, discountedAmount, discountedPercent)
+                )
+            }
+            if (nonApplicable.isNotEmpty()) {
+                nonDiscountedRows.add(
+                    NonDiscountedCheckoutRow(nonApplicable, nonApplicable.sumOf { it.price })
+                )
+            }
         }
-        return MutableLiveData(rows)
+        val checkoutRows = discountedRows + nonDiscountedRows
+        val totalAmount = checkoutRows.sumOf { it.amount }
+        val originalAmount = cart.sumOf { it.price }
+        return CheckoutData(
+            checkoutRows = checkoutRows,
+            totalQuantity = cart.size,
+            totalAmount = totalAmount,
+            totalDiscount = (1 - totalAmount / originalAmount) * 100
+        )
     }
 
     val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->
@@ -79,7 +106,7 @@ class StoreViewModel @Inject constructor(
                     discounts.find { discount ->
                         discount.isApplicableTo(product)
                     }?.let {
-                        DiscountedProduct(product.code, product.name, it.expressAsString(context))
+                        DiscountedProduct(product, it)
                     }
                 }
 
