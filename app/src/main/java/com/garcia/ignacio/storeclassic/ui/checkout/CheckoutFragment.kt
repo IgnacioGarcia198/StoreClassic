@@ -47,10 +47,9 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getCheckoutData().observe(viewLifecycleOwner) { checkoutData ->
+        viewModel.checkoutData.observe(viewLifecycleOwner) { checkoutData ->
             renderCheckoutData(checkoutData)
         }
-        viewModel.computeCheckoutData()
     }
 
     private fun renderCheckoutData(checkoutData: List<CheckoutRow>) {

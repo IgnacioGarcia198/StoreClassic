@@ -1,9 +1,9 @@
 package com.garcia.ignacio.storeclassic.ui
 
 import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
@@ -47,25 +47,66 @@ class StoreViewModel @Inject constructor(
     private val effect = MutableLiveData<Event<Effect>>(Event(Effect.Idle))
     fun getEffect(): LiveData<Event<Effect>> = effect
 
-    private var discounts = emptyList<Discount>()
-    private val cart = mutableListOf<Product>()
-    private val checkoutData = MutableLiveData(emptyList<CheckoutRow>())
-    fun getCheckoutData(): LiveData<List<CheckoutRow>> = checkoutData
+    private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
+    private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
 
-    fun computeCheckoutData() {
-        viewModelScope.launch {
-            withContext(Dispatchers.Default) {
-                computeCheckoutRowsSuspend()
-            }.also { checkoutData.value = it }
+    val discountedProducts: LiveData<List<DiscountedProduct>>
+        get() {
+            val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
+            var productsState: State = State.Loading
+            var discountsList: List<Discount> = emptyList()
+
+            fun updateDiscountedProducts() {
+                viewModelScope.launch {
+                    findDiscountedProducts(productsState, discountsList).also {
+                        mediator.value = it
+                    }
+                }
+            }
+
+            mediator.addSource(state) {
+                productsState = it
+                updateDiscountedProducts()
+            }
+            mediator.addSource(discounts) {
+                discountsList = it
+                updateDiscountedProducts()
+            }
+            return mediator
         }
-    }
+
+    val checkoutData: LiveData<List<CheckoutRow>>
+        get() {
+            val mediator = MediatorLiveData(emptyList<CheckoutRow>())
+            var discountsList: List<Discount> = emptyList()
+            var cartList: List<Product> = emptyList()
+
+            fun computeCheckoutData() {
+                viewModelScope.launch {
+                    computeCheckoutRows(cartList, discountsList)
+                        .also { mediator.value = it }
+                }
+            }
+
+            mediator.addSource(cart) {
+                cartList = it
+                computeCheckoutData()
+            }
+            mediator.addSource(discounts) {
+                discountsList = it
+                computeCheckoutData()
+            }
+            return mediator
+        }
 
     fun clearCart() {
-        cart.clear()
-        computeCheckoutData()
+        cart.value = mutableListOf()
     }
 
-    private fun computeCheckoutRowsSuspend(): List<CheckoutRow> {
+    private suspend fun computeCheckoutRows(
+        cart: List<Product>,
+        discounts: List<Discount>,
+    ): List<CheckoutRow> = withContext(Dispatchers.Default) {
         val discountedRows = mutableListOf<CheckoutRow>()
         val nonDiscountedRows = mutableListOf<CheckoutRow>()
         cart.groupBy { it.code }.values.forEach { productGroup ->
@@ -94,7 +135,7 @@ class StoreViewModel @Inject constructor(
             }
         }
         val checkoutRows = discountedRows + nonDiscountedRows
-        return if (checkoutRows.isEmpty()) checkoutRows
+        return@withContext if (checkoutRows.isEmpty()) checkoutRows
         else {
             val totalAmount = checkoutRows.sumOf { it.amount }
             val originalAmount = cart.sumOf { it.price }
@@ -107,7 +148,10 @@ class StoreViewModel @Inject constructor(
         }
     }
 
-    val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->
+    private suspend fun findDiscountedProducts(
+        state: State,
+        discounts: List<Discount>
+    ): List<DiscountedProduct> = withContext(Dispatchers.Default) {
         when (state) {
             is State.Ready ->
                 state.products.mapNotNull { product ->
@@ -137,7 +181,7 @@ class StoreViewModel @Inject constructor(
 
     private fun getRepositoryDiscounts(): Flow<ResultList<List<Discount>>> =
         discountsRepository.discounts.onEach { result ->
-            discounts = result.result
+            discounts.value = result.result
             errorHandler.handleErrors(result.errors, ErrorType.DISCOUNT)
         }
 
@@ -153,15 +197,15 @@ class StoreViewModel @Inject constructor(
 
     fun pendingAddToCartConfirmed() {
         pendingAddToCart?.let { addToCart ->
-            repeat(addToCart.quantity) {
-                cart.add(addToCart.product)
-            }
+            val toAdd = (1..addToCart.quantity).map { addToCart.product }
+            cart.value = cart.value!! + toAdd
             effect.value = Event(Effect.AddToCartConfirmed(addToCart))
             pendingAddToCart = null
         }
     }
 
-    fun hasDiscounts(product: Product): Boolean = discounts.any { it.isApplicableTo(product) }
+    fun hasDiscounts(product: Product): Boolean =
+        discounts.value!!.any { it.isApplicableTo(product) }
 
     override fun reportErrors(errors: List<ReportableError>) {
         val message = errors.joinToString("\n") { "- ${it.errorMessage}" }
