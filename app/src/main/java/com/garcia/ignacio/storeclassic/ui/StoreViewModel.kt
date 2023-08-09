@@ -3,6 +3,7 @@ package com.garcia.ignacio.storeclassic.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
@@ -46,12 +47,17 @@ class StoreViewModel @Inject constructor(
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
 
-    val discountedProducts: LiveData<List<DiscountedProduct>> by lazy {
+    private val discountedProducts: LiveData<List<DiscountedProduct>> by lazy {
         helper.getDiscountedProducts(productsState, discounts, viewModelScope)
     }
     val checkoutData: LiveData<List<CheckoutRow>> by lazy {
         helper.getCheckoutData(cart, discounts, viewModelScope)
     }
+
+    fun getDiscountsForProduct(productCode: String? = null): LiveData<List<DiscountedProduct>> =
+        discountedProducts.map { list ->
+            productCode?.let { list.filter { it.product.code == productCode } } ?: list
+        }
 
     fun clearCart() {
         cart.value = mutableListOf()
