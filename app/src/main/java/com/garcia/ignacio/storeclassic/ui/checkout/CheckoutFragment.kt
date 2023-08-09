@@ -57,9 +57,13 @@ class CheckoutFragment : Fragment() {
         val emptyCart = checkoutData.isEmpty()
         binding.checkoutGroup.isVisible = !emptyCart
         binding.emptyCartText.isVisible = emptyCart
+        binding.clearCart.isVisible = !emptyCart
         if (!emptyCart) {
-            adapter.submitList(checkoutData)
+            binding.clearCart.setOnClickListener {
+                viewModel.clearCart()
+            }
         }
+        adapter.submitList(checkoutData)
     }
 
     override fun onDestroyView() {

@@ -60,6 +60,11 @@ class StoreViewModel @Inject constructor(
         }
     }
 
+    fun clearCart() {
+        cart.clear()
+        computeCheckoutData()
+    }
+
     private fun computeCheckoutRowsSuspend(): List<CheckoutRow> {
         val discountedRows = mutableListOf<CheckoutRow>()
         val nonDiscountedRows = mutableListOf<CheckoutRow>()

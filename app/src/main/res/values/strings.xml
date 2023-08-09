@@ -54,4 +54,5 @@
     <string name="checkout_header_quantity">Quantity</string>
     <string name="checkout_header_amount">Amount</string>
     <string name="checkout_header_discount">Discount</string>
+    <string name="checkout_clear_shopping_cart_action">Clear shopping cart</string>
 </resources>
