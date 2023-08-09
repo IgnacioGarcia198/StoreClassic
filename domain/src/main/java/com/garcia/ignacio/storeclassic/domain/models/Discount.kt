@@ -15,8 +15,17 @@ sealed class Discount {
         }
     }
 
+    abstract fun partitionApplicableProducts(
+        products: List<Product>
+    ): Pair<List<Product>, List<Product>>
+
+
     protected open fun applyToAll(products: List<Product>): Double {
-        return products.groupBy { it.code }.values.sumOf { applyDiscount(it) }
+        return products.groupBy {
+            it.code
+        }.values.sumOf { group ->
+            if (group.isNotEmpty()) applyDiscount(group) else 0.0
+        }
     }
 
     protected abstract fun applyDiscount(applicableProducts: List<Product>): Double
@@ -37,6 +46,17 @@ sealed class Discount {
                     singleProducts * originalPrice
         }
 
+        override fun partitionApplicableProducts(
+            products: List<Product>
+        ): Pair<List<Product>, List<Product>> =
+            products.partition { it.code == productCode }.let { (applicable, nonApplicable) ->
+                val cannotApply = applicable.size % productsBought
+                if (cannotApply > 0) {
+                    (nonApplicable + applicable.takeLast(cannotApply)) to
+                            applicable.dropLast(cannotApply)
+                } else applicable to nonApplicable
+            }
+
         companion object {
             const val TYPE = "XForY"
         }
@@ -55,6 +75,12 @@ sealed class Discount {
             return applicableProducts.size * price
         }
 
+        override fun partitionApplicableProducts(
+            products: List<Product>
+        ): Pair<List<Product>, List<Product>> =
+            if (products.size >= minimumBought) products to emptyList()
+            else emptyList<Product>() to products
+
         companion object {
             const val TYPE = "BuyInBulk"
         }
@@ -65,6 +91,10 @@ sealed class Discount {
         override val productCode: String?,
         val params: List<Double>,
     ) : Discount() {
+        override fun partitionApplicableProducts(
+            products: List<Product>
+        ): Pair<List<Product>, List<Product>> = emptyList<Product>() to products
+
         override fun applyDiscount(applicableProducts: List<Product>): Double {
             return applicableProducts.sumOf { it.price }
         }
