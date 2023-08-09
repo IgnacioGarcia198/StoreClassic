@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.appcompat.app.AlertDialog
+import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
 import com.garcia.ignacio.storeclassic.R
@@ -63,6 +64,10 @@ class DiscountsDialog : DialogFragment() {
     private fun observeViewModel() {
         viewModel.getDiscountsForProduct(productCode).observe(viewLifecycleOwner) { list ->
             discountsAdapter.submitList(list)
+            val emptyDiscounts = list.isEmpty()
+            binding.noDiscountsText.isVisible = emptyDiscounts
+            binding.productHeader.isVisible = !emptyDiscounts
+            binding.discountHeader.isVisible = !emptyDiscounts
         }
     }
 

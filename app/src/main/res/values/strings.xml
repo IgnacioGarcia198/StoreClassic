@@ -8,7 +8,6 @@
     <string name="checkout_action">Checkout</string>
 
     <!-- Store Discount List -->
-    <string name="retrieving_discounts">Retrieving discounts…</string>
     <string name="no_discounts_available">No discounts available.</string>
     <string name="product">Product</string>
     <string name="discount">Discount</string>
