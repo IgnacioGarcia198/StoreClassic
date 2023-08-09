@@ -112,4 +112,8 @@ class StoreViewModel @Inject constructor(
         productsEffect.value = Event(ProductsEffect.DisplayDiscounts(product))
     }
 
+    fun goToCheckout() {
+        productsEffect.value = Event(ProductsEffect.Checkout)
+    }
+
 }

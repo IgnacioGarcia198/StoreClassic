@@ -10,4 +10,5 @@ sealed interface ProductsEffect {
     data class AddToCartConfirmed(val addToCart: AddToCart) : ProductsEffect
     data class ReportErrors(val compoundError: ReportableError) : ProductsEffect
     data class DisplayDiscounts(val product: Product) : ProductsEffect
+    object Checkout : ProductsEffect
 }

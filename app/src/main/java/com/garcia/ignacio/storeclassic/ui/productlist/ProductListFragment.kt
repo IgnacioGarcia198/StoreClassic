@@ -89,7 +89,7 @@ class ProductListFragment : Fragment() {
         initializeRecyclerView()
         observeViewModel()
         binding.checkoutFab.setOnClickListener {
-            findNavController().navigate(R.id.action_ProductsFragment_to_CheckoutFragment)
+            viewModel.goToCheckout()
         }
     }
 
@@ -137,6 +137,9 @@ class ProductListFragment : Fragment() {
 
             is ProductsEffect.DisplayDiscounts ->
                 displayDiscountsForProduct(effect.product)
+
+            ProductsEffect.Checkout ->
+                findNavController().navigate(R.id.action_ProductsFragment_to_CheckoutFragment)
         }
     }
 
