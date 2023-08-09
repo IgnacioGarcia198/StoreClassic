@@ -26,12 +26,14 @@ class DiscountsDialog : DialogFragment() {
     lateinit var discountsAdapter: DiscountsAdapter
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
-        val builder = AlertDialog.Builder(
+        return AlertDialog.Builder(
             requireContext()
-        )
-        _binding = DialogDiscountsBinding.inflate(layoutInflater, null, false)
-        builder.setView(binding.root)
-        return builder.create()
+        ).setPositiveButton(R.string.close) { _, _ ->
+            dismiss()
+        }.setView(
+            DialogDiscountsBinding.inflate(layoutInflater, null, false)
+                .also { _binding = it }.root
+        ).create()
     }
 
     override fun onCreateView(
