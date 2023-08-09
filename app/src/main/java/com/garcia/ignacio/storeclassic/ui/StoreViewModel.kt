@@ -35,12 +35,12 @@ class StoreViewModel @Inject constructor(
     private val errorHandler: ErrorHandler,
     private val helper: StoreViewModelHelper,
 ) : ViewModel(), ErrorReporter {
-    private val state = MutableLiveData<State>(State.Loading)
-    fun getState(): LiveData<State> = state
+    private val productsState = MutableLiveData<ProductsState>(ProductsState.Loading)
+    fun getProductsState(): LiveData<ProductsState> = productsState
     var pendingAddToCart: AddToCart? = null
         private set
-    private val effect = MutableLiveData<Event<Effect>>(Event(Effect.Idle))
-    fun getEffect(): LiveData<Event<Effect>> = effect
+    private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
+    fun getEffect(): LiveData<Event<ProductsEffect>> = productsEffect
 
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
@@ -48,10 +48,10 @@ class StoreViewModel @Inject constructor(
     val discountedProducts: LiveData<List<DiscountedProduct>>
         get() {
             val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
-            var productsState: State = State.Loading
+            var productsState: ProductsState = ProductsState.Loading
             var discountsList: List<Discount> = emptyList()
 
-            mediator.addSource(state) {
+            mediator.addSource(this.productsState) {
                 productsState = it
                 helper.updateDiscountedProducts(
                     productsState, discountsList, viewModelScope, mediator
@@ -96,7 +96,7 @@ class StoreViewModel @Inject constructor(
 
     private fun getRepositoryProducts(): Flow<ResultList<List<Product>>> =
         productsRepository.products.onEach { result ->
-            state.value = State.Ready(result.result)
+            productsState.value = ProductsState.Ready(result.result)
             errorHandler.handleErrors(result.errors, ErrorType.PRODUCT)
         }
 
@@ -108,8 +108,8 @@ class StoreViewModel @Inject constructor(
 
     fun pendingAddToCart(product: Product, quantity: Int) {
         pendingAddToCart = AddToCart(product, quantity)
-        effect.value = Event(Effect.Idle)
-        effect.value = Event(Effect.AddToCartConfirmation)
+        productsEffect.value = Event(ProductsEffect.Idle)
+        productsEffect.value = Event(ProductsEffect.AddToCartConfirmation)
     }
 
     fun pendingAddToCartCancelled() {
@@ -120,7 +120,7 @@ class StoreViewModel @Inject constructor(
         pendingAddToCart?.let { addToCart ->
             val toAdd = (1..addToCart.quantity).map { addToCart.product }
             cart.value = cart.value!! + toAdd
-            effect.value = Event(Effect.AddToCartConfirmed(addToCart))
+            productsEffect.value = Event(ProductsEffect.AddToCartConfirmed(addToCart))
             pendingAddToCart = null
         }
     }
@@ -135,23 +135,23 @@ class StoreViewModel @Inject constructor(
             prefix = ERROR_REPORT_HEADER // TODO: Here we can add info on the device and OS
         ) { it.reportMessage }
         val reportableError = ReportableError(message, report)
-        effect.value = Event(Effect.ReportErrors(reportableError))
+        productsEffect.value = Event(ProductsEffect.ReportErrors(reportableError))
     }
 
     fun displayDiscounts(product: Product) {
-        effect.value = Event(Effect.DisplayDiscounts(product))
+        productsEffect.value = Event(ProductsEffect.DisplayDiscounts(product))
     }
 
-    sealed interface Effect {
-        object Idle : Effect
-        object AddToCartConfirmation : Effect
-        data class AddToCartConfirmed(val addToCart: AddToCart) : Effect
-        data class ReportErrors(val compoundError: ReportableError) : Effect
-        data class DisplayDiscounts(val product: Product) : Effect
+    sealed interface ProductsEffect {
+        object Idle : ProductsEffect
+        object AddToCartConfirmation : ProductsEffect
+        data class AddToCartConfirmed(val addToCart: AddToCart) : ProductsEffect
+        data class ReportErrors(val compoundError: ReportableError) : ProductsEffect
+        data class DisplayDiscounts(val product: Product) : ProductsEffect
     }
 
-    sealed interface State {
-        object Loading : State
-        data class Ready(val products: List<Product>) : State
+    sealed interface ProductsState {
+        object Loading : ProductsState
+        data class Ready(val products: List<Product>) : ProductsState
     }
 }

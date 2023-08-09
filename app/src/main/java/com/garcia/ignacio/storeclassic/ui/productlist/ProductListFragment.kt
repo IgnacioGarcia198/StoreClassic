@@ -94,7 +94,7 @@ class ProductListFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getState().observe(viewLifecycleOwner) {
+        viewModel.getProductsState().observe(viewLifecycleOwner) {
             renderState(it)
         }
         viewModel.getEffect().observe(viewLifecycleOwner) { event ->
@@ -104,13 +104,13 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun renderState(state: StoreViewModel.State) {
+    private fun renderState(state: StoreViewModel.ProductsState) {
         when (state) {
-            StoreViewModel.State.Loading -> {
+            StoreViewModel.ProductsState.Loading -> {
                 showLoading()
             }
 
-            is StoreViewModel.State.Ready -> {
+            is StoreViewModel.ProductsState.Ready -> {
                 hideLoading()
                 productsAdapter.submitList(state.products)
                 binding.noProductsText.isVisible = state.products.isEmpty()
@@ -118,24 +118,24 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun renderEffect(effect: StoreViewModel.Effect) {
+    private fun renderEffect(effect: StoreViewModel.ProductsEffect) {
         when (effect) {
-            StoreViewModel.Effect.AddToCartConfirmation ->
+            StoreViewModel.ProductsEffect.AddToCartConfirmation ->
                 viewModel.pendingAddToCart?.let {
                     showAddToCartConfirmationDialog(it.product, it.quantity)
                 }
 
-            StoreViewModel.Effect.Idle -> {
+            StoreViewModel.ProductsEffect.Idle -> {
                 // NOP
             }
 
-            is StoreViewModel.Effect.AddToCartConfirmed ->
+            is StoreViewModel.ProductsEffect.AddToCartConfirmed ->
                 showAddedToCartFeedback(effect.addToCart)
 
-            is StoreViewModel.Effect.ReportErrors ->
+            is StoreViewModel.ProductsEffect.ReportErrors ->
                 showErrorsFeedback(effect.compoundError)
 
-            is StoreViewModel.Effect.DisplayDiscounts ->
+            is StoreViewModel.ProductsEffect.DisplayDiscounts ->
                 displayDiscountsForProduct(effect.product)
         }
     }

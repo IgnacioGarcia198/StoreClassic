@@ -17,7 +17,7 @@ import javax.inject.Inject
 class StoreViewModelHelper @Inject constructor() {
 
     fun updateDiscountedProducts(
-        state: StoreViewModel.State,
+        state: StoreViewModel.ProductsState,
         discounts: List<Discount>,
         scope: CoroutineScope,
         liveData: MutableLiveData<List<DiscountedProduct>>,
@@ -87,11 +87,11 @@ class StoreViewModelHelper @Inject constructor() {
     }
 
     private suspend fun findDiscountedProducts(
-        state: StoreViewModel.State,
+        state: StoreViewModel.ProductsState,
         discounts: List<Discount>
     ): List<DiscountedProduct> = withContext(Dispatchers.Default) {
         when (state) {
-            is StoreViewModel.State.Ready ->
+            is StoreViewModel.ProductsState.Ready ->
                 state.products.mapNotNull { product ->
                     discounts.find { discount ->
                         discount.isApplicableTo(product)
