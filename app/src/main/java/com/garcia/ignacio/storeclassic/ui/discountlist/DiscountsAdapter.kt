@@ -24,7 +24,7 @@ class DiscountsAdapter @Inject constructor() :
 
 class DiscountDiffCallback : DiffUtil.ItemCallback<DiscountedProduct>() {
     override fun areItemsTheSame(oldItem: DiscountedProduct, newItem: DiscountedProduct): Boolean {
-        return oldItem.discountText == newItem.discountText && oldItem.productName == newItem.productName
+        return oldItem == newItem
     }
 
     override fun areContentsTheSame(
