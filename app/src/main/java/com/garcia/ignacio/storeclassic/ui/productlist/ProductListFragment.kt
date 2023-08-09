@@ -33,6 +33,7 @@ private const val ADD_TO_CART_CONFIRMATION_DIALOG = "AddToCartConfirmation"
 private const val DEVELOPER_EMAIL = "ignaciogarcia198@gmail.com"
 private const val EMAIL_MIME_TYPE = "message/rfc822"
 private const val ERROR_FEEDBACK_MAX_LINES = 10
+private const val ERROR_FEEDBACK_DURATION = 4000
 
 @AndroidEntryPoint
 class ProductListFragment : Fragment() {
@@ -156,7 +157,7 @@ class ProductListFragment : Fragment() {
         Snackbar.make(
             requireView(),
             getString(R.string.error_feedback_title, compoundError.errorMessage),
-            Snackbar.LENGTH_LONG
+            ERROR_FEEDBACK_DURATION
         ).setAction(getString(R.string.error_feedback_report_action)) {
             reportError(compoundError)
         }.setActionTextColor(
