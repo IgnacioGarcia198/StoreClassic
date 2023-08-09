@@ -11,10 +11,10 @@ import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutData
 import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
+import com.garcia.ignacio.storeclassic.ui.checkout.TotalCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
@@ -49,8 +49,8 @@ class StoreViewModel @Inject constructor(
 
     private var discounts = emptyList<Discount>()
     private val cart = mutableListOf<Product>()
-    private val checkoutData = MutableLiveData(CheckoutData())
-    fun getCheckoutData(): LiveData<CheckoutData> = checkoutData
+    private val checkoutData = MutableLiveData(emptyList<CheckoutRow>())
+    fun getCheckoutData(): LiveData<List<CheckoutRow>> = checkoutData
 
     fun computeCheckoutData() {
         viewModelScope.launch {
@@ -60,7 +60,7 @@ class StoreViewModel @Inject constructor(
         }
     }
 
-    private fun computeCheckoutRowsSuspend(): CheckoutData {
+    private fun computeCheckoutRowsSuspend(): List<CheckoutRow> {
         val discountedRows = mutableListOf<CheckoutRow>()
         val nonDiscountedRows = mutableListOf<CheckoutRow>()
         cart.groupBy { it.code }.values.forEach { productGroup ->
@@ -91,12 +91,12 @@ class StoreViewModel @Inject constructor(
         val checkoutRows = discountedRows + nonDiscountedRows
         val totalAmount = checkoutRows.sumOf { it.amount }
         val originalAmount = cart.sumOf { it.price }
-        return CheckoutData(
-            checkoutRows = checkoutRows,
-            totalQuantity = cart.size,
-            totalAmount = totalAmount,
-            totalDiscount = (1 - totalAmount / originalAmount) * 100
+        val totalRow = TotalCheckoutRow(
+            quantity = cart.size,
+            amount = totalAmount,
+            discountedPercent = (1 - totalAmount / originalAmount) * 100
         )
+        return discountedRows + nonDiscountedRows + totalRow
     }
 
     val discountedProducts: LiveData<List<DiscountedProduct>> = state.map { state ->

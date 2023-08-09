@@ -22,3 +22,11 @@ data class NonDiscountedCheckoutRow(
 ) : CheckoutRow {
     override val discountedPercent: Double = 0.0
 }
+
+data class TotalCheckoutRow(
+    val quantity: Int,
+    override val amount: Double,
+    override val discountedPercent: Double,
+) : CheckoutRow {
+    override val products: List<Product> = emptyList()
+}
