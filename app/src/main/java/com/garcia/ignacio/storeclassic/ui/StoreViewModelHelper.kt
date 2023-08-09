@@ -1,5 +1,7 @@
 package com.garcia.ignacio.storeclassic.ui
 
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
@@ -17,7 +19,51 @@ import javax.inject.Inject
 
 class StoreViewModelHelper @Inject constructor() {
 
-    fun updateDiscountedProducts(
+    fun getCheckoutData(
+        cartLiveData: LiveData<List<Product>>,
+        discountsLiveData: LiveData<List<Discount>>,
+        scope: CoroutineScope,
+    ): MediatorLiveData<List<CheckoutRow>> {
+        val mediator = MediatorLiveData(emptyList<CheckoutRow>())
+        var discounts: List<Discount> = emptyList()
+        var cart: List<Product> = emptyList()
+
+        mediator.addSource(cartLiveData) {
+            cart = it
+            computeCheckoutData(cart, discounts, scope, mediator)
+        }
+        mediator.addSource(discountsLiveData) {
+            discounts = it
+            computeCheckoutData(cart, discounts, scope, mediator)
+        }
+        return mediator
+    }
+
+    fun getDiscountedProducts(
+        productsStateLiveData: LiveData<ProductsState>,
+        discountsLiveData: LiveData<List<Discount>>,
+        scope: CoroutineScope,
+    ): MediatorLiveData<List<DiscountedProduct>> {
+        val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
+        var productsState: ProductsState = ProductsState.Loading
+        var discounts: List<Discount> = emptyList()
+
+        mediator.addSource(productsStateLiveData) {
+            productsState = it
+            updateDiscountedProducts(
+                productsState, discounts, scope, mediator
+            )
+        }
+        mediator.addSource(discountsLiveData) {
+            discounts = it
+            updateDiscountedProducts(
+                productsState, discounts, scope, mediator
+            )
+        }
+        return mediator
+    }
+
+    private fun updateDiscountedProducts(
         state: ProductsState,
         discounts: List<Discount>,
         scope: CoroutineScope,
@@ -30,7 +76,7 @@ class StoreViewModelHelper @Inject constructor() {
         }
     }
 
-    fun computeCheckoutData(
+    private fun computeCheckoutData(
         cart: List<Product>,
         discounts: List<Discount>,
         scope: CoroutineScope,

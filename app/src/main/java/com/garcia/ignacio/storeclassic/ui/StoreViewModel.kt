@@ -1,7 +1,6 @@
 package com.garcia.ignacio.storeclassic.ui
 
 import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -47,43 +46,11 @@ class StoreViewModel @Inject constructor(
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
 
-    val discountedProducts: LiveData<List<DiscountedProduct>> by lazy { discountedProducts() }
-    val checkoutData: LiveData<List<CheckoutRow>> by lazy { checkoutData() }
-
-    private fun discountedProducts(): MediatorLiveData<List<DiscountedProduct>> {
-        val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
-        var productsState: ProductsState = ProductsState.Loading
-        var discountsList: List<Discount> = emptyList()
-
-        mediator.addSource(this.productsState) {
-            productsState = it
-            helper.updateDiscountedProducts(
-                productsState, discountsList, viewModelScope, mediator
-            )
-        }
-        mediator.addSource(discounts) {
-            discountsList = it
-            helper.updateDiscountedProducts(
-                productsState, discountsList, viewModelScope, mediator
-            )
-        }
-        return mediator
+    val discountedProducts: LiveData<List<DiscountedProduct>> by lazy {
+        helper.getDiscountedProducts(productsState, discounts, viewModelScope)
     }
-
-    private fun checkoutData(): MediatorLiveData<List<CheckoutRow>> {
-        val mediator = MediatorLiveData(emptyList<CheckoutRow>())
-        var discountsList: List<Discount> = emptyList()
-        var cartList: List<Product> = emptyList()
-
-        mediator.addSource(cart) {
-            cartList = it
-            helper.computeCheckoutData(cartList, discountsList, viewModelScope, mediator)
-        }
-        mediator.addSource(discounts) {
-            discountsList = it
-            helper.computeCheckoutData(cartList, discountsList, viewModelScope, mediator)
-        }
-        return mediator
+    val checkoutData: LiveData<List<CheckoutRow>> by lazy {
+        helper.getCheckoutData(cart, discounts, viewModelScope)
     }
 
     fun clearCart() {
