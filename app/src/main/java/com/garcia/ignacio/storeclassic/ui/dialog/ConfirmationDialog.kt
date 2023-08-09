@@ -4,7 +4,6 @@ import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
 import androidx.appcompat.app.AlertDialog
-import androidx.appcompat.app.AppCompatActivity
 import androidx.core.os.bundleOf
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.Fragment
@@ -56,21 +55,6 @@ class ConfirmationDialog : DialogFragment(), DialogInterface.OnClickListener {
     }
 }
 
-fun AppCompatActivity.showConfirmationDialog(
-    tag: String,
-    title: CharSequence,
-    message: CharSequence,
-    confirmText: CharSequence? = null,
-    cancelText: CharSequence? = null,
-    neutralText: CharSequence? = null,
-) {
-    val fragment = newInstance(tag, title, message, confirmText, cancelText, neutralText)
-    supportFragmentManager
-        .beginTransaction()
-        .add(fragment, tag)
-        .commitAllowingStateLoss()
-}
-
 private fun newInstance(
     tag: String,
     title: CharSequence,
@@ -89,7 +73,6 @@ private fun newInstance(
     )
 }
 
-
 fun Fragment.showConfirmationDialog(
     tag: String,
     title: CharSequence,
@@ -99,7 +82,7 @@ fun Fragment.showConfirmationDialog(
     neutralText: CharSequence? = null,
 ) {
     val fragment = newInstance(tag, title, message, confirmText, cancelText, neutralText)
-    childFragmentManager
+    parentFragmentManager
         .beginTransaction()
         .add(fragment, tag)
         .commitAllowingStateLoss()
