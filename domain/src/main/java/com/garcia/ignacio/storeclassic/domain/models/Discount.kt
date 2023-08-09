@@ -52,8 +52,8 @@ sealed class Discount {
             products.partition { it.code == productCode }.let { (applicable, nonApplicable) ->
                 val cannotApply = applicable.size % productsBought
                 if (cannotApply > 0) {
-                    (nonApplicable + applicable.takeLast(cannotApply)) to
-                            applicable.dropLast(cannotApply)
+                    val newNonApplicable = nonApplicable + applicable.takeLast(cannotApply)
+                    applicable.dropLast(cannotApply) to newNonApplicable
                 } else applicable to nonApplicable
             }
 
