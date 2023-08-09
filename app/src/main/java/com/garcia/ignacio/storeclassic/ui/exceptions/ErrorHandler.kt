@@ -18,6 +18,7 @@ class ErrorHandler @Inject constructor(
         errors: List<Throwable>,
         errorType: ErrorType,
     ) {
+        reportableErrors.clear()
         if (errors.isEmpty()) return
         when (errorType) {
             ErrorType.PRODUCT ->
