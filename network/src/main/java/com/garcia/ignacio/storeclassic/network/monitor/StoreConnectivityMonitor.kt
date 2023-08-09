@@ -45,7 +45,9 @@ class StoreConnectivityMonitor @Inject constructor(
     }
 
     override val isNetworkConnected: Boolean
-        get() = isNetworkConnectedFlow.value
+        get() = connectivityManager
+            .getNetworkCapabilities(connectivityManager.activeNetwork)
+            .areValid()
 
     override fun startMonitoringNetworkConnection() {
         if (_currentNetwork.value.isListening) {
@@ -122,21 +124,14 @@ class StoreConnectivityMonitor @Inject constructor(
             isBlocked = false
         )
     }
-}
 
-private data class CurrentNetwork(
-    val isListening: Boolean,
-    val networkCapabilities: NetworkCapabilities?,
-    val isAvailable: Boolean,
-    val isBlocked: Boolean,
-) {
-    val isConnected: Boolean
+    private val CurrentNetwork.isConnected: Boolean
         get() = isListening &&
                 isAvailable &&
                 !isBlocked &&
-                networkCapabilities.isNetworkCapabilitiesValid()
+                networkCapabilities.areValid()
 
-    private fun NetworkCapabilities?.isNetworkCapabilitiesValid(): Boolean = when {
+    private fun NetworkCapabilities?.areValid(): Boolean = when {
         this == null -> false
         hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET) &&
                 hasCapability(NetworkCapabilities.NET_CAPABILITY_VALIDATED) &&
@@ -151,3 +146,10 @@ private data class CurrentNetwork(
                 hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) ||
                 hasTransport(NetworkCapabilities.TRANSPORT_ETHERNET)
 }
+
+private data class CurrentNetwork(
+    val isListening: Boolean,
+    val networkCapabilities: NetworkCapabilities?,
+    val isAvailable: Boolean,
+    val isBlocked: Boolean,
+)
