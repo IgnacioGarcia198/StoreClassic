@@ -12,7 +12,7 @@ class ErrorHandler @Inject constructor(
     private val context: Application
 ) {
     lateinit var errorReporter: ErrorReporter
-    private val reportableErrors = mutableListOf<ReportableError>()
+    private val reportableErrors = mutableSetOf<ReportableError>()
 
     fun handleErrors(
         errors: List<Throwable>,
@@ -100,7 +100,23 @@ class ErrorHandler @Inject constructor(
                     throw StoreException.Misusing("UnimplementedDiscount not available for Product")
                 }
             }
+
+            is StoreException.DeviceOffline ->
+                handleDeviceOffline(error)
         }
+    }
+
+    private fun handleDeviceOffline(error: StoreException.DeviceOffline) {
+        val errorMessage =
+            if (BuildConfig.DEBUG) {
+                "Device is offline: ${error.message.orEmpty()}"
+            } else {
+                context.getString(R.string.device_offline_user_feedback)
+            }
+        addReportableError(
+            errorMessage,
+            "Products client error: ${error.stackTraceToString()}"
+        )
     }
 
     private fun handleStageException(

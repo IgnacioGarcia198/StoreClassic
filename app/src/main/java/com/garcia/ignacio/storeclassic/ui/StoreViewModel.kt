@@ -125,7 +125,7 @@ class StoreViewModel @Inject constructor(
     fun hasDiscounts(product: Product): Boolean =
         discounts.value!!.any { it.isApplicableTo(product) }
 
-    override fun reportErrors(errors: List<ReportableError>) {
+    override fun reportErrors(errors: Set<ReportableError>) {
         val message = errors.joinToString("\n") { "- ${it.errorMessage}" }
         val report = errors.joinToString(
             ERROR_REPORT_ITEM_SEPARATOR,
