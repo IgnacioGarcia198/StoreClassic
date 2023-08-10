@@ -10,8 +10,8 @@ import androidx.core.os.bundleOf
 import androidx.core.text.HtmlCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.setFragmentResultListener
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
@@ -19,7 +19,7 @@ import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.StoreViewModel
+import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutFragment
 import com.garcia.ignacio.storeclassic.ui.dialog.ConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.dialog.showConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountsDialog
@@ -36,7 +36,7 @@ class ProductListFragment : Fragment() {
 
     private var _binding: FragmentProductListBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: StoreViewModel by activityViewModels()
+    private val viewModel: ProductListViewModel by viewModels()
 
     @Inject
     lateinit var productsAdapter: ProductsAdapter
@@ -131,8 +131,11 @@ class ProductListFragment : Fragment() {
             is ProductsEffect.DisplayDiscounts ->
                 displayDiscountsForProduct(effect.product)
 
-            ProductsEffect.Checkout ->
-                findNavController().navigate(R.id.action_ProductsFragment_to_CheckoutFragment)
+            is ProductsEffect.Checkout ->
+                findNavController().navigate(
+                    R.id.action_ProductsFragment_to_CheckoutFragment,
+                    bundleOf(CheckoutFragment.ARG_CART to effect.products.toTypedArray())
+                )
         }
     }
 

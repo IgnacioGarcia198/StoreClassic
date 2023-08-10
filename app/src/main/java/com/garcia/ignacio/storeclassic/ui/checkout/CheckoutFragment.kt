@@ -6,11 +6,12 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
+import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
-import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import com.garcia.ignacio.storeclassic.ui.model.ListState
+import com.garcia.ignacio.storeclassic.ui.model.UiProduct
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -19,7 +20,7 @@ class CheckoutFragment : Fragment() {
 
     private var _binding: FragmentCheckoutBinding? = null
     private val binding get() = _binding!!
-    private val viewModel: StoreViewModel by activityViewModels()
+    private val viewModel: CheckoutViewModel by viewModels()
 
     @Inject
     lateinit var adapter: CheckoutAdapter
@@ -27,14 +28,25 @@ class CheckoutFragment : Fragment() {
     @Inject
     lateinit var formatter: StoreFormatter
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        initializeViewModel(savedInstanceState)
+    }
+
+    private fun initializeViewModel(savedInstanceState: Bundle?) {
+        if (savedInstanceState == null) {
+            val cart = arguments?.getParcelableArray(ARG_CART)
+                ?: throw StoreException.Misusing("Checkout needs a list of products")
+            viewModel.initialize(cart as Array<UiProduct>)
+        }
+    }
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
-
         _binding = FragmentCheckoutBinding.inflate(inflater, container, false)
         return binding.root
-
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -90,5 +102,9 @@ class CheckoutFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    companion object {
+        const val ARG_CART = "cart"
     }
 }

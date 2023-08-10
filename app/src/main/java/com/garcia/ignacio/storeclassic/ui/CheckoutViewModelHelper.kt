@@ -10,7 +10,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class StoreViewModelHelper @Inject constructor() {
+class CheckoutViewModelHelper @Inject constructor() {
 
     suspend fun computeCheckoutData(
         cart: List<Product>,

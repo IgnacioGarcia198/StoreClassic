@@ -6,8 +6,6 @@ import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.garcia.ignacio.storeclassic.databinding.ProductListItemBinding
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
-import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import javax.inject.Inject
 
@@ -15,9 +13,9 @@ class ProductsAdapter @Inject constructor(
     private val formatter: StoreFormatter,
 ) : ListAdapter<DiscountedProduct, ProductViewHolder>(ProductDiffCallback()) {
 
-    lateinit var viewModel: StoreViewModel
+    lateinit var viewModel: ProductListViewModel
 
-    fun initialize(viewModel: StoreViewModel) {
+    fun initialize(viewModel: ProductListViewModel) {
         this.viewModel = viewModel
     }
 
@@ -42,7 +40,10 @@ class ProductDiffCallback : DiffUtil.ItemCallback<DiscountedProduct>() {
         return oldItem == newItem
     }
 
-    override fun areContentsTheSame(oldItem: DiscountedProduct, newItem: DiscountedProduct): Boolean {
+    override fun areContentsTheSame(
+        oldItem: DiscountedProduct,
+        newItem: DiscountedProduct
+    ): Boolean {
         return oldItem == newItem
     }
 }
