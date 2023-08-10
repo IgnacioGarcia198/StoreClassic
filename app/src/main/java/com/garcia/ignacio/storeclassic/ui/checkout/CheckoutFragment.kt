@@ -33,11 +33,12 @@ class CheckoutFragment : Fragment() {
         initializeViewModel(savedInstanceState)
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun initializeViewModel(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            val cart = arguments?.getParcelableArray(ARG_CART)
+            val cart = arguments?.getParcelableArray(ARG_CART) as? Array<UiProduct>
                 ?: throw StoreException.Misusing("Checkout needs a list of products")
-            viewModel.initialize(cart as Array<UiProduct>)
+            viewModel.initialize(cart)
         }
     }
 
