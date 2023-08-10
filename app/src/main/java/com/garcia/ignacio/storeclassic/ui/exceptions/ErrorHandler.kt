@@ -103,7 +103,26 @@ class ErrorHandler @Inject constructor(
 
             is StoreException.DeviceOffline ->
                 handleDeviceOffline(error)
+
+            is StoreException.ErrorRetrievingDiscountedProducts -> {
+                handleRetrieveDiscountedProductsError(error)
+            }
         }
+    }
+
+    private fun handleRetrieveDiscountedProductsError(
+        error: StoreException.ErrorRetrievingDiscountedProducts
+    ) {
+        val errorMessage =
+            if (BuildConfig.DEBUG) {
+                "Error retrieving discounted products from db: ${error.message.orEmpty()}"
+            } else {
+                context.getString(R.string.retrieve_discounted_products_error_user_feedback)
+            }
+        addReportableError(
+            errorMessage,
+            "Error retrieving discounted products from db: ${error.stackTraceToString()}"
+        )
     }
 
     private fun handleDeviceOffline(error: StoreException.DeviceOffline) {
@@ -115,7 +134,7 @@ class ErrorHandler @Inject constructor(
             }
         addReportableError(
             errorMessage,
-            "Products client error: ${error.stackTraceToString()}"
+            "Products client error (most probably just device was offline): ${error.stackTraceToString()}"
         )
     }
 
