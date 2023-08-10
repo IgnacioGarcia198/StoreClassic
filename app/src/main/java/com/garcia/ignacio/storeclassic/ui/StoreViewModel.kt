@@ -9,7 +9,6 @@ import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
-import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
@@ -22,7 +21,10 @@ import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
@@ -32,6 +34,7 @@ import javax.inject.Inject
 private const val ERROR_REPORT_ITEM_SEPARATOR = "\n====================\n"
 private const val ERROR_REPORT_HEADER = "ERROR REPORT\n\n"
 
+@OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class StoreViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
@@ -47,11 +50,9 @@ class StoreViewModel @Inject constructor(
         private set
     private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
     private val appEffect = MutableLiveData<Event<AppEffect>>(Event(AppEffect.Idle))
-    fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
     fun getAppEffect(): LiveData<Event<AppEffect>> = appEffect
-
-    private var discounts: List<Discount> = emptyList()
-    private val cart = mutableListOf<Product>()
+    fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
+    private val cart = MutableStateFlow<List<Product>>(emptyList())
     private var isConnectionAvailable = true
 
     fun getDiscountsForProduct(
@@ -66,14 +67,16 @@ class StoreViewModel @Inject constructor(
         }
 
     fun getCheckoutData(): Flow<List<CheckoutRow>> =
-        discountedProductsRepository.findDiscountedProducts(
-            cart.map { it.code }.toSet()
-        ).map { result ->
-            result.map {
-                helper.computeCheckoutData(cart, it)
-            }.onFailure {
-                errorHandler.handleErrors(listOf(it))
-            }.getOrDefault(emptyList())
+        cart.flatMapLatest { cart ->
+            discountedProductsRepository.findDiscountedProducts(
+                cart.map { it.code }.toSet()
+            ).map { result ->
+                result.map {
+                    helper.computeCheckoutData(cart, it)
+                }.onFailure {
+                    errorHandler.handleErrors(listOf(it))
+                }.getOrDefault(emptyList())
+            }
         }
 
     fun getAllProductsWithDiscountsIfAny() =
@@ -85,7 +88,7 @@ class StoreViewModel @Inject constructor(
         }.launchIn(viewModelScope)
 
     fun clearCart() {
-        cart.clear()
+        cart.value = emptyList()
     }
 
     init {
@@ -137,14 +140,11 @@ class StoreViewModel @Inject constructor(
     fun pendingAddToCartConfirmed() {
         pendingAddToCart?.let { addToCart ->
             val toAdd = (1..addToCart.quantity).map { addToCart.product }
-            cart.addAll(toAdd)
+            cart.value = cart.value + toAdd
             productsEffect.value = Event(ProductsEffect.AddToCartConfirmed(addToCart))
             pendingAddToCart = null
         }
     }
-
-    fun hasDiscounts(product: Product): Boolean =
-        discounts.any { it.isApplicableTo(product) }
 
     override fun reportErrors(errors: Set<ReportableError>) {
         val message = errors.joinToString("\n") { "- ${it.errorMessage}" }
