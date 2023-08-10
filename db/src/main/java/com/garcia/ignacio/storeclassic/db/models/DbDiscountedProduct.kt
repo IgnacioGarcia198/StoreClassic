@@ -7,11 +7,13 @@ data class DbDiscountedProduct(
     val productCode: String,
     val name: String,
     val price: Double,
-    val discountType: String,
-    val discountParams: List<Double>,
+    val discountType: String? = null,
+    val discountParams: List<Double>? = null,
 ) {
     fun toDomain(): DiscountedProduct = DiscountedProduct(
         Product(productCode, name, price),
-        DbDiscount(discountType, productCode, discountParams).toDomain()
+        if (discountType != null && discountParams != null) {
+            DbDiscount(discountType, productCode, discountParams).toDomain()
+        } else null
     )
 }

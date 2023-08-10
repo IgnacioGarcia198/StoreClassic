@@ -5,4 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface DiscountedProductsLocalDataStore {
     fun findDiscountedProducts(productCodes: Set<String>): Flow<List<DiscountedProduct>>
+    fun getAllProductsAndDiscountIfAny(): Flow<List<DiscountedProduct>>
 }

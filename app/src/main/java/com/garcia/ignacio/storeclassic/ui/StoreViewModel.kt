@@ -4,7 +4,6 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
@@ -23,12 +22,11 @@ import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 private const val ERROR_REPORT_ITEM_SEPARATOR = "\n====================\n"
@@ -55,7 +53,6 @@ class StoreViewModel @Inject constructor(
     private var discounts: List<Discount> = emptyList()
     private val cart = mutableListOf<Product>()
     private var isConnectionAvailable = true
-    private var updateJob: Job? = null
 
     fun getDiscountsForProduct(
         productCode: String? = null
@@ -79,22 +76,30 @@ class StoreViewModel @Inject constructor(
             }.getOrDefault(emptyList())
         }
 
+    fun getAllProductsWithDiscountsIfAny() =
+        discountedProductsRepository.getAllProductsWithDiscountsIfAny().map { result ->
+            result.onFailure {
+                errorHandler.handleErrors(listOf(it))
+            }.getOrDefault(emptyList())
+                .also { productsState.value = ProductsState.Ready(it) }
+        }.launchIn(viewModelScope)
+
     fun clearCart() {
         cart.clear()
     }
 
     init {
         errorHandler.errorReporter = this
-        updateDataFromNetwork()
         startMonitoringNetworkConnection()
+        updateDataFromNetwork()
     }
 
     private fun updateDataFromNetwork() {
-        productsState.value = ProductsState.Loading
-        updateJob?.cancel()
-        updateJob = getRepositoryDiscounts().combine(
-            getRepositoryProducts()
-        ) { _, _ -> }.launchIn(viewModelScope)
+        viewModelScope.launch {
+            productsState.value = ProductsState.Loading
+            updateDiscountsFromNetwork()
+            updateProductsFromNetwork()
+        }
     }
 
     private fun startMonitoringNetworkConnection() {
@@ -108,17 +113,17 @@ class StoreViewModel @Inject constructor(
             }.launchIn(viewModelScope)
     }
 
-    private fun getRepositoryProducts(): Flow<ResultList<List<Product>>> =
-        productsRepository.products.onEach { result ->
-            productsState.value = ProductsState.Ready(result.result)
-            errorHandler.handleErrors(result.errors, ErrorType.PRODUCT)
+    private suspend fun updateProductsFromNetwork() {
+        productsRepository.updateProducts().onFailure {
+            errorHandler.handleErrors(listOf(it), ErrorType.PRODUCT)
         }
+    }
 
-    private fun getRepositoryDiscounts(): Flow<ResultList<List<Discount>>> =
-        discountsRepository.discounts.onEach { result ->
-            discounts = result.result
-            errorHandler.handleErrors(result.errors, ErrorType.DISCOUNT)
+    private suspend fun updateDiscountsFromNetwork() {
+        discountsRepository.updateDiscounts().onFailure {
+            errorHandler.handleErrors(listOf(it), ErrorType.DISCOUNT)
         }
+    }
 
     fun pendingAddToCart(product: Product, quantity: Int) {
         pendingAddToCart = AddToCart(product, quantity)

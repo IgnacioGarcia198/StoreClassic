@@ -22,6 +22,13 @@ abstract class DiscountedProductDao {
     )
     abstract fun getAllDiscountedProducts(): Flow<List<DbDiscountedProduct>>
 
+    @Query(
+        "SELECT products.code AS productCode, products.name, products.price, " +
+                "discounts.type AS discountType, discounts.params AS discountParams " +
+                "FROM products LEFT JOIN discounts ON discounts.productCode = products.code"
+    )
+    abstract fun getAllProductsAndDiscountIfAny(): Flow<List<DbDiscountedProduct>>
+
     fun getDiscountedProducts(productCodes: Set<String>): Flow<List<DbDiscountedProduct>> {
         return if (productCodes.isEmpty()) getAllDiscountedProducts()
         else findDiscountedProducts(productCodes)

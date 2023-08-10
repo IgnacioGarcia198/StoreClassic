@@ -4,9 +4,9 @@ import androidx.room.TypeConverter
 
 class DbTypeConverters {
     @TypeConverter
-    fun doubleListToString(list: List<Double>) = list.joinToString(",")
+    fun doubleListToString(list: List<Double>?) = list?.joinToString(",")
 
     @TypeConverter
-    fun stringToDoubleList(listString: String) =
-        listString.split(",").map { it.toDouble() }
+    fun stringToDoubleList(listString: String?) =
+        listString?.split(",")?.map { it.toDouble() }
 }

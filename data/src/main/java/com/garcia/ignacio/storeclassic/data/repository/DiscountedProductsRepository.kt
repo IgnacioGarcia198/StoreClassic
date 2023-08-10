@@ -24,4 +24,11 @@ class DiscountedProductsRepository @Inject constructor(
         }.catch {
             emit(Result.failure(StoreException.ErrorRetrievingDiscountedProducts(it)))
         }.flowOn(Dispatchers.IO)
+
+    fun getAllProductsWithDiscountsIfAny(): Flow<Result<List<DiscountedProduct>>> =
+        localDataStore.getAllProductsAndDiscountIfAny().map {
+            Result.success(it)
+        }.catch {
+            emit(Result.failure(StoreException.ErrorRetrievingDiscountedProducts(it)))
+        }.flowOn(Dispatchers.IO)
 }

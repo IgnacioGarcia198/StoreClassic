@@ -22,7 +22,7 @@ class StoreViewModelHelper @Inject constructor() {
             val discount = discountedProducts.map {
                 it.discount
             }.find {
-                it.productCode == productCode
+                it?.productCode == productCode
             } ?: let {
                 nonDiscountedRows.add(
                     NonDiscountedCheckoutRow(

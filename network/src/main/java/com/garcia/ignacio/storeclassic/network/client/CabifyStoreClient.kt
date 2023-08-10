@@ -24,28 +24,24 @@ class CabifyStoreClient @Inject constructor(
         clientFactory.createStoreHttpClient()
     }
 
-    override fun getProducts(): Flow<List<Product>> = flow {
-        emit(
-            Json.decodeFromString<ProductsResponse>(
-                httpClient.get(PRODUCTS_ENDPOINT).body()
-            ).products.map { it.toDomain() }
-        )
+    override suspend fun getProducts(): Result<List<Product>> = kotlin.runCatching {
+        Json.decodeFromString<ProductsResponse>(
+            httpClient.get(PRODUCTS_ENDPOINT).body()
+        ).products.map { it.toDomain() }
     }
 
-    override fun getDiscounts(): Flow<List<Discount>> = flow {
-        emit(
-            listOf(
-                NetworkDiscount(
-                    type = Discount.XForY.TYPE,
-                    productCode = ProductCode.VOUCHER.name,
-                    params = listOf(2.0, 1.0)
-                ),
-                NetworkDiscount(
-                    type = Discount.BuyInBulk.TYPE,
-                    productCode = ProductCode.TSHIRT.name,
-                    params = listOf(3.0, 5.0)
-                )
-            ).map { it.toDomain() }
-        )
+    override suspend fun getDiscounts(): Result<List<Discount>> = kotlin.runCatching {
+        listOf(
+            NetworkDiscount(
+                type = Discount.XForY.TYPE,
+                productCode = ProductCode.VOUCHER.name,
+                params = listOf(2.0, 1.0)
+            ),
+            NetworkDiscount(
+                type = Discount.BuyInBulk.TYPE,
+                productCode = ProductCode.TSHIRT.name,
+                params = listOf(3.0, 5.0)
+            )
+        ).map { it.toDomain() }
     }
 }

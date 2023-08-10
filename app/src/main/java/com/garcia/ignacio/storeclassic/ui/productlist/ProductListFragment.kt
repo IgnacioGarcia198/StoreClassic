@@ -82,6 +82,9 @@ class ProductListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeRecyclerView()
         observeViewModel()
+        if (savedInstanceState == null) {
+            viewModel.getAllProductsWithDiscountsIfAny()
+        }
         binding.checkoutFab.setOnClickListener {
             viewModel.goToCheckout()
         }

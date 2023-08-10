@@ -5,6 +5,6 @@ import com.garcia.ignacio.storeclassic.domain.models.Product
 import kotlinx.coroutines.flow.Flow
 
 interface StoreClient {
-    fun getProducts(): Flow<List<Product>>
-    fun getDiscounts(): Flow<List<Discount>>
+    suspend fun getProducts(): Result<List<Product>>
+    suspend fun getDiscounts(): Result<List<Discount>>
 }

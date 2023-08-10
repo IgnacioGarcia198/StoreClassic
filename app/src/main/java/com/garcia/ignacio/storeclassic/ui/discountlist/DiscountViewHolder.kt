@@ -11,6 +11,6 @@ class DiscountViewHolder(
 
     fun bind(discountedProduct: DiscountedProduct) {
         binding.productName.text = discountedProduct.product.name
-        binding.discountText.text = discountedProduct.discount.expressAsString(itemView.context)
+        binding.discountText.text = discountedProduct.discount?.expressAsString(itemView.context)
     }
 }

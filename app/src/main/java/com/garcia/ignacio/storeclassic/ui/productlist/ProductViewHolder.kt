@@ -5,6 +5,7 @@ import android.widget.AdapterView
 import android.widget.ArrayAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.garcia.ignacio.storeclassic.databinding.ProductListItemBinding
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
@@ -28,12 +29,12 @@ class ProductViewHolder(
         }
     }
 
-    fun bind(product: Product) {
+    fun bind(product: DiscountedProduct) {
         binding.seeDiscounts.visibility =
-            if (viewModel.hasDiscounts(product)) View.VISIBLE
+            if (product.discount != null) View.VISIBLE
             else View.INVISIBLE
         binding.seeDiscounts.setOnClickListener {
-            viewModel.displayDiscounts(product)
+            viewModel.displayDiscounts(product.product)
         }
         binding.addToCart.setSelection(binding.addToCart.selectedItemPosition, false)
         binding.addToCart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -43,14 +44,14 @@ class ProductViewHolder(
                 position: Int,
                 id: Long
             ) {
-                viewModel.pendingAddToCart(product, position + 1)
+                viewModel.pendingAddToCart(product.product, position + 1)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {
                 // NOP
             }
         }
-        binding.productName.text = product.name
-        binding.productPrice.text = formatter.formatPrice(product.price)
+        binding.productName.text = product.product.name
+        binding.productPrice.text = formatter.formatPrice(product.product.price)
     }
 }
