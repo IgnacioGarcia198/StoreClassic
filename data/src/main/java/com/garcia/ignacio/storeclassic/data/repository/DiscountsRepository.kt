@@ -34,6 +34,7 @@ class DiscountsRepository @Inject constructor(
             val exception =
                 if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
                 else StoreException.DeviceOffline(it)
+            errors.clear()
             errors.add(exception)
             emit(emptyList())
         }.onEach { discounts ->
