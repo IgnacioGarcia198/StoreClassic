@@ -14,8 +14,26 @@ android {
         versionName "1.0"
     }
 
+    signingConfigs {
+        release {
+            if (project.hasProperty("storeClassicKeyAlias")) {
+                keyAlias = project.storeClassicKeyAlias
+            }
+            if (project.hasProperty("storeClassickeyPassword")) {
+                keyPassword = project.storeClassickeyPassword
+            }
+            if (project.hasProperty("storeClassicStoreFile")) {
+                storeFile = file(project.storeClassicStoreFile)
+            }
+            if (project.hasProperty("storeClassicStorePassword")) {
+                storePassword = project.storeClassicStorePassword
+            }
+        }
+    }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
