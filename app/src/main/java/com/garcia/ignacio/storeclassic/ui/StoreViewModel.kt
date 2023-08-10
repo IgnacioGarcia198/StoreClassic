@@ -70,8 +70,11 @@ class StoreViewModel @Inject constructor(
         discountedProductsRepository.findDiscountedProducts(
             productCode?.let { setOf(productCode) } ?: emptySet()
         ).onEach { result ->
-            discountsForCurrentProduct.value = result.result
-            errorHandler.handleErrors(result.errors, ErrorType.DISCOUNT)
+            result.onSuccess {
+                discountsForCurrentProduct.value = it
+            }.onFailure {
+                errorHandler.handleErrors(listOf(it), ErrorType.DISCOUNT)
+            }
         }.launchIn(viewModelScope)
     }
 

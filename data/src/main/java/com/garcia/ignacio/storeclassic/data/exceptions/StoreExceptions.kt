@@ -15,6 +15,11 @@ sealed interface StoreException {
         message: String? = cause?.message
     ) : RuntimeException(message, cause), StoreException
 
+    class ErrorRetrievingDiscountedProducts(
+        cause: Throwable?,
+        message: String? = cause?.message
+    ) : RuntimeException(message, cause), StoreException
+
     class UnimplementedDiscount(val discount: Discount) : Throwable(), StoreException
 
     class Misusing(message: String?) : RuntimeException(message), StoreException
