@@ -23,7 +23,12 @@ class ProductsRepository @Inject constructor(
                 else StoreException.DeviceOffline(it)
             }.map {
                 if (it.isNotEmpty()) localDataStore.updateProducts(it)
-            }.mapError { stageException(Stage.DB_WRITE, it) }
+            }.mapError { throwable ->
+                when (throwable) {
+                    is StoreException -> throwable
+                    else -> stageException(Stage.DB_WRITE, throwable)
+                }
+            }
     }
 
     private fun stageException(
