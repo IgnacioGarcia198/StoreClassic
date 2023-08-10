@@ -54,45 +54,30 @@ class StoreViewModel @Inject constructor(
 
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart = mutableListOf<Product>()
-
-    private val checkoutData: MutableLiveData<List<CheckoutRow>> = MutableLiveData(emptyList())
-    fun getCheckoutData(): LiveData<List<CheckoutRow>> = checkoutData
     private var isConnectionAvailable = true
     private var updateJob: Job? = null
 
-    private val discountsForCurrentProduct: MutableLiveData<List<DiscountedProduct>> =
-        MutableLiveData(emptyList())
-
-    fun getDiscountsForCurrentProduct(): LiveData<List<DiscountedProduct>> =
-        discountsForCurrentProduct
-
-    fun computeDiscountsForProduct(productCode: String? = null) {
+    fun getDiscountsForProduct(
+        productCode: String? = null
+    ): Flow<List<DiscountedProduct>> =
         discountedProductsRepository.findDiscountedProducts(
             productCode?.let { setOf(productCode) } ?: emptySet()
-        ).onEach { result ->
-            result.onSuccess {
-                discountsForCurrentProduct.value = it
-            }.onFailure {
+        ).map { result ->
+            result.onFailure {
                 errorHandler.handleErrors(listOf(it))
-            }
-        }.launchIn(viewModelScope)
-    }
+            }.getOrDefault(emptyList())
+        }
 
-    fun computeCheckoutData() {
+    fun getCheckoutData(): Flow<List<CheckoutRow>> =
         discountedProductsRepository.findDiscountedProducts(
             cart.map { it.code }.toSet()
         ).map { result ->
-            result.fold(
-                onSuccess = { helper.computeCheckoutData(cart, it) },
-                onFailure = {
-                    errorHandler.handleErrors(listOf(it))
-                    emptyList()
-                }
-            ).also {
-                checkoutData.value = it
-            }
-        }.launchIn(viewModelScope)
-    }
+            result.map {
+                helper.computeCheckoutData(cart, it)
+            }.onFailure {
+                errorHandler.handleErrors(listOf(it))
+            }.getOrDefault(emptyList())
+        }
 
     fun clearCart() {
         cart.clear()

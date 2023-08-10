@@ -9,10 +9,14 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.DialogDiscountsBinding
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -55,9 +59,6 @@ class DiscountsDialog : DialogFragment() {
 
         initializeRecyclerView()
         observeViewModel()
-        if (savedInstanceState == null) {
-            viewModel.computeDiscountsForProduct(productCode)
-        }
     }
 
     private fun initializeRecyclerView() {
@@ -65,13 +66,18 @@ class DiscountsDialog : DialogFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getDiscountsForCurrentProduct().observe(viewLifecycleOwner) { list ->
-            discountsAdapter.submitList(list)
-            val emptyDiscounts = list.isEmpty()
-            binding.noDiscountsText.isVisible = emptyDiscounts
-            binding.productHeader.isVisible = !emptyDiscounts
-            binding.discountHeader.isVisible = !emptyDiscounts
-        }
+        viewModel.getDiscountsForProduct(productCode)
+            .onEach {
+                renderDiscounts(it)
+            }.launchIn(lifecycleScope)
+    }
+
+    private fun renderDiscounts(list: List<DiscountedProduct>) {
+        discountsAdapter.submitList(list)
+        val emptyDiscounts = list.isEmpty()
+        binding.noDiscountsText.isVisible = emptyDiscounts
+        binding.productHeader.isVisible = !emptyDiscounts
+        binding.discountHeader.isVisible = !emptyDiscounts
     }
 
     override fun onDestroyView() {

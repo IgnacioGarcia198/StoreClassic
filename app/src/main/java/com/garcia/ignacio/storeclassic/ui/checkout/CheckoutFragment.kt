@@ -7,10 +7,13 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.lifecycle.lifecycleScope
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -40,9 +43,6 @@ class CheckoutFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeRecyclerView()
         observeViewModel()
-        if (savedInstanceState == null) {
-            viewModel.computeCheckoutData()
-        }
     }
 
     private fun initializeRecyclerView() {
@@ -50,9 +50,9 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getCheckoutData().observe(viewLifecycleOwner) { checkoutData ->
-            renderCheckoutData(checkoutData)
-        }
+        viewModel.getCheckoutData().onEach {
+            renderCheckoutData(it)
+        }.launchIn(lifecycleScope)
     }
 
     private fun renderCheckoutData(checkoutData: List<CheckoutRow>) {
