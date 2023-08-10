@@ -17,12 +17,14 @@ import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.dialog.ConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.dialog.showConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountsDialog
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
+import com.garcia.ignacio.storeclassic.ui.model.ListState
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -101,16 +103,16 @@ class ProductListFragment : Fragment() {
         }
     }
 
-    private fun renderState(state: ProductsState) {
+    private fun renderState(state: ListState<DiscountedProduct>) {
         when (state) {
-            ProductsState.Loading -> {
+            ListState.Loading -> {
                 showLoading()
             }
 
-            is ProductsState.Ready -> {
+            is ListState.Ready -> {
                 hideLoading()
-                productsAdapter.submitList(state.products)
-                binding.noProductsText.isVisible = state.products.isEmpty()
+                productsAdapter.submitList(state.list)
+                binding.noProductsText.isVisible = state.list.isEmpty()
             }
         }
     }

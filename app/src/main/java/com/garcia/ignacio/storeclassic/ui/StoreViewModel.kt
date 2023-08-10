@@ -17,9 +17,9 @@ import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
+import com.garcia.ignacio.storeclassic.ui.model.ListState
 import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
-import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
@@ -44,8 +44,8 @@ class StoreViewModel @Inject constructor(
     private val helper: StoreViewModelHelper,
     private val connectivityMonitor: ConnectivityMonitor,
 ) : ViewModel(), ErrorReporter {
-    private val productsState = MutableLiveData<ProductsState>(ProductsState.Loading)
-    fun getProductsState(): LiveData<ProductsState> = productsState
+    private val productsState = MutableLiveData<ListState<DiscountedProduct>>(ListState.Loading)
+    fun getProductsState(): LiveData<ListState<DiscountedProduct>> = productsState
     var pendingAddToCart: AddToCart? = null
         private set
     private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
@@ -84,7 +84,7 @@ class StoreViewModel @Inject constructor(
             result.onFailure {
                 errorHandler.handleErrors(listOf(it))
             }.getOrDefault(emptyList())
-                .also { productsState.value = ProductsState.Ready(it) }
+                .also { productsState.value = ListState.Ready(it) }
         }.launchIn(viewModelScope)
 
     fun clearCart() {
@@ -99,7 +99,7 @@ class StoreViewModel @Inject constructor(
 
     private fun updateDataFromNetwork() {
         viewModelScope.launch {
-            productsState.value = ProductsState.Loading
+            productsState.value = ListState.Loading
             updateDiscountsFromNetwork()
             updateProductsFromNetwork()
         }
