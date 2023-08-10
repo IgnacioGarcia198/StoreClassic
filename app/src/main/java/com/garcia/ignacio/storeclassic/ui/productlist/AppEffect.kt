@@ -1,6 +1,6 @@
 package com.garcia.ignacio.storeclassic.ui.productlist
 
-import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
+import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 
 sealed interface AppEffect {
     object Idle : AppEffect

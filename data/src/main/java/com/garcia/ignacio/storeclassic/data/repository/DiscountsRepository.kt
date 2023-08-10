@@ -1,6 +1,7 @@
 package com.garcia.ignacio.storeclassic.data.repository
 
 import com.garcia.ignacio.storeclassic.common.extensions.mapError
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
@@ -15,6 +16,7 @@ class DiscountsRepository @Inject constructor(
     private val storeClient: StoreClient,
     private val localDataStore: DiscountsLocalDataStore,
     private val connectivityMonitor: ConnectivityMonitor,
+    private val errorHandler: ErrorHandler,
 ) {
     suspend fun updateDiscounts(): Result<Unit> = withContext(Dispatchers.IO) {
         storeClient.getDiscounts()
@@ -27,6 +29,8 @@ class DiscountsRepository @Inject constructor(
                 when (throwable) {
                     is StoreException -> throwable
                     else -> stageException(Stage.DB_WRITE, throwable)
+                }.also {
+                    errorHandler.handleErrors(listOf(it))
                 }
             }
     }

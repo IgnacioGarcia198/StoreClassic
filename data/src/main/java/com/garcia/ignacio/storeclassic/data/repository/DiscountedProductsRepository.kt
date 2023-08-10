@@ -1,5 +1,6 @@
 package com.garcia.ignacio.storeclassic.data.repository
 
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.data.local.DiscountedProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
@@ -12,6 +13,7 @@ import javax.inject.Inject
 
 class DiscountedProductsRepository @Inject constructor(
     private val localDataStore: DiscountedProductsLocalDataStore,
+    private val errorHandler: ErrorHandler,
 ) {
 
     fun findDiscountedProducts(
@@ -22,13 +24,13 @@ class DiscountedProductsRepository @Inject constructor(
         ).map {
             Result.success(it)
         }.catch {
-            emit(Result.failure(StoreException.ErrorRetrievingDiscountedProducts(it)))
+            errorHandler.handleErrors(listOf(StoreException.ErrorRetrievingDiscountedProducts(it)))
         }.flowOn(Dispatchers.IO)
 
     fun getAllProductsWithDiscountsIfAny(): Flow<Result<List<DiscountedProduct>>> =
         localDataStore.getAllProductsAndDiscountIfAny().map {
             Result.success(it)
         }.catch {
-            emit(Result.failure(StoreException.ErrorRetrievingDiscountedProducts(it)))
+            errorHandler.handleErrors(listOf(StoreException.ErrorRetrievingDiscountedProducts(it)))
         }.flowOn(Dispatchers.IO)
 }

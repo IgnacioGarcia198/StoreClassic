@@ -14,7 +14,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.ActivityMainBinding
-import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
+import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint

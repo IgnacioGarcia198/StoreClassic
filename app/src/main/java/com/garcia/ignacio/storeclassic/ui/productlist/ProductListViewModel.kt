@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import com.garcia.ignacio.storeclassic.ui.model.ListState
@@ -21,7 +20,6 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
-    private val errorHandler: ErrorHandler,
 ) : ViewModel() {
     private val productsState = MutableLiveData<ListState<DiscountedProduct>>(ListState.Loading)
     fun getProductsState(): LiveData<ListState<DiscountedProduct>> = productsState
@@ -64,9 +62,7 @@ class ProductListViewModel @Inject constructor(
 
     private fun initializeAllProductsWithDiscountsIfAny() {
         discountedProductsRepository.getAllProductsWithDiscountsIfAny().map { result ->
-            result.onFailure {
-                errorHandler.handleErrors(listOf(it))
-            }.getOrDefault(emptyList())
+            result.getOrDefault(emptyList())
                 .also { productsState.value = ListState.Ready(it) }
         }.launchIn(viewModelScope)
     }

@@ -4,13 +4,12 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
-import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
-import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
-import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
+import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -29,16 +28,22 @@ class MainViewModel @Inject constructor(
     private val discountsRepository: DiscountsRepository,
     private val connectivityMonitor: ConnectivityMonitor,
     private val errorHandler: ErrorHandler,
-) : ViewModel(), ErrorReporter {
+) : ViewModel() {
     private var wasConnected = true
 
     private val appEffect = MutableLiveData<Event<AppEffect>>(Event(AppEffect.Idle))
     fun getAppEffect(): LiveData<Event<AppEffect>> = appEffect
 
     init {
-        errorHandler.errorReporter = this
+        startMonitoringErrors()
         startMonitoringNetworkConnection()
         updateDataFromNetwork()
+    }
+
+    private fun startMonitoringErrors() {
+        errorHandler.getErrors()
+            .onEach { reportErrors(it) }
+            .launchIn(viewModelScope)
     }
 
     private fun startMonitoringNetworkConnection() {
@@ -71,12 +76,7 @@ class MainViewModel @Inject constructor(
         }
     }
 
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
-    }
-
-    override fun reportErrors(errors: Set<ReportableError>) {
+    private fun reportErrors(errors: Set<ReportableError>) {
         val message = errors.joinToString("\n") { "- ${it.errorMessage}" }
         val report = errors.joinToString(
             ERROR_REPORT_ITEM_SEPARATOR,
@@ -84,5 +84,10 @@ class MainViewModel @Inject constructor(
         ) { it.reportMessage }
         val reportableError = ReportableError(message, report)
         appEffect.value = Event(AppEffect.ReportErrors(reportableError))
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        viewModelScope.cancel()
     }
 }

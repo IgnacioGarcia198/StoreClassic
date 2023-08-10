@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.CheckoutViewModelHelper
-import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import com.garcia.ignacio.storeclassic.ui.model.UiProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,7 +22,6 @@ import javax.inject.Inject
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
-    private val errorHandler: ErrorHandler,
     private val helper: CheckoutViewModelHelper,
 ) : ViewModel() {
 
@@ -47,8 +45,6 @@ class CheckoutViewModel @Inject constructor(
             ).map { result ->
                 result.map {
                     helper.computeCheckoutData(cart, it)
-                }.onFailure {
-                    errorHandler.handleErrors(listOf(it))
                 }.getOrDefault(
                     emptyList()
                 ).also {

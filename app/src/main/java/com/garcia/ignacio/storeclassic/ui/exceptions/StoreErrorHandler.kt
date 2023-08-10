@@ -3,22 +3,30 @@ package com.garcia.ignacio.storeclassic.ui.exceptions
 import android.app.Application
 import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
+import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
+import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.data.exceptions.Stage
 import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import javax.inject.Inject
 
-class ErrorHandler @Inject constructor(
+class StoreErrorHandler @Inject constructor(
     private val context: Application
-) {
-    lateinit var errorReporter: ErrorReporter
+) : ErrorHandler {
     private val reportableErrors = mutableSetOf<ReportableError>()
+    private val errorsStateFlow: MutableStateFlow<Set<ReportableError>> =
+        MutableStateFlow(emptySet())
 
-    fun handleErrors(
+    override fun getErrors(): StateFlow<Set<ReportableError>> = errorsStateFlow
+
+    override fun handleErrors(
         errors: List<Throwable>,
-        errorType: ErrorType? = null,
+        errorType: ErrorType?
     ) {
         reportableErrors.clear()
+        errorsStateFlow.value = emptySet()
         if (errors.isEmpty()) return
         when (errorType) {
             ErrorType.DISCOUNT -> {
@@ -32,10 +40,11 @@ class ErrorHandler @Inject constructor(
                     handleAllErrors(otherErrors)
                 }
             }
+
             else ->
                 handleAllErrors(errors)
         }
-        errorReporter.reportErrors(reportableErrors)
+        errorsStateFlow.value = reportableErrors
     }
 
     private fun handleAllErrors(errors: List<Throwable>) {

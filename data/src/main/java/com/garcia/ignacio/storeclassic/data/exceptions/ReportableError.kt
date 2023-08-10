@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui.exceptions
+package com.garcia.ignacio.storeclassic.data.exceptions
 
 data class ReportableError(
     val errorMessage: String,
