@@ -27,6 +27,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -52,11 +53,10 @@ class StoreViewModel @Inject constructor(
     fun getAppEffect(): LiveData<Event<AppEffect>> = appEffect
 
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
-    private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
+    private val cart = mutableListOf<Product>()
 
-    val checkoutData: LiveData<List<CheckoutRow>> by lazy {
-        helper.getCheckoutData(cart, discounts, viewModelScope)
-    }
+    private val checkoutData: MutableLiveData<List<CheckoutRow>> = MutableLiveData(emptyList())
+    fun getCheckoutData(): LiveData<List<CheckoutRow>> = checkoutData
     private var isConnectionAvailable = true
     private var updateJob: Job? = null
 
@@ -73,14 +73,29 @@ class StoreViewModel @Inject constructor(
             result.onSuccess {
                 discountsForCurrentProduct.value = it
             }.onFailure {
-                errorHandler.handleErrors(listOf(it), ErrorType.DISCOUNT)
+                errorHandler.handleErrors(listOf(it))
             }
         }.launchIn(viewModelScope)
     }
 
+    fun computeCheckoutData() {
+        discountedProductsRepository.findDiscountedProducts(
+            cart.map { it.code }.toSet()
+        ).map { result ->
+            result.fold(
+                onSuccess = { helper.computeCheckoutData(cart, it) },
+                onFailure = {
+                    errorHandler.handleErrors(listOf(it))
+                    emptyList()
+                }
+            ).also {
+                checkoutData.value = it
+            }
+        }.launchIn(viewModelScope)
+    }
 
     fun clearCart() {
-        cart.value = mutableListOf()
+        cart.clear()
     }
 
     init {
@@ -132,7 +147,7 @@ class StoreViewModel @Inject constructor(
     fun pendingAddToCartConfirmed() {
         pendingAddToCart?.let { addToCart ->
             val toAdd = (1..addToCart.quantity).map { addToCart.product }
-            cart.value = cart.value!! + toAdd
+            cart.addAll(toAdd)
             productsEffect.value = Event(ProductsEffect.AddToCartConfirmed(addToCart))
             pendingAddToCart = null
         }

@@ -16,14 +16,11 @@ class ErrorHandler @Inject constructor(
 
     fun handleErrors(
         errors: List<Throwable>,
-        errorType: ErrorType,
+        errorType: ErrorType? = null,
     ) {
         reportableErrors.clear()
         if (errors.isEmpty()) return
         when (errorType) {
-            ErrorType.PRODUCT ->
-                handleAllErrors(errors)
-
             ErrorType.DISCOUNT -> {
                 val (unimplemented, otherErrors) = errors.partition {
                     it is StoreException.UnimplementedDiscount
@@ -35,6 +32,8 @@ class ErrorHandler @Inject constructor(
                     handleAllErrors(otherErrors)
                 }
             }
+            else ->
+                handleAllErrors(errors)
         }
         errorReporter.reportErrors(reportableErrors)
     }

@@ -40,6 +40,9 @@ class CheckoutFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeRecyclerView()
         observeViewModel()
+        if (savedInstanceState == null) {
+            viewModel.computeCheckoutData()
+        }
     }
 
     private fun initializeRecyclerView() {
@@ -47,7 +50,7 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.checkoutData.observe(viewLifecycleOwner) { checkoutData ->
+        viewModel.getCheckoutData().observe(viewLifecycleOwner) { checkoutData ->
             renderCheckoutData(checkoutData)
         }
     }

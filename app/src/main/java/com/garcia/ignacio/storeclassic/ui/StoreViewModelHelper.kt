@@ -1,68 +1,34 @@
 package com.garcia.ignacio.storeclassic.ui
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MediatorLiveData
-import androidx.lifecycle.MutableLiveData
-import com.garcia.ignacio.storeclassic.domain.models.Discount
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.TotalCheckoutRow
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 class StoreViewModelHelper @Inject constructor() {
 
-    fun getCheckoutData(
-        cartLiveData: LiveData<List<Product>>,
-        discountsLiveData: LiveData<List<Discount>>,
-        scope: CoroutineScope,
-    ): MediatorLiveData<List<CheckoutRow>> {
-        val mediator = MediatorLiveData(emptyList<CheckoutRow>())
-        var discounts: List<Discount> = emptyList()
-        var cart: List<Product> = emptyList()
-
-        mediator.addSource(cartLiveData) {
-            cart = it
-            computeCheckoutData(cart, discounts, scope, mediator)
-        }
-        mediator.addSource(discountsLiveData) {
-            discounts = it
-            computeCheckoutData(cart, discounts, scope, mediator)
-        }
-        return mediator
-    }
-
-    private fun computeCheckoutData(
+    suspend fun computeCheckoutData(
         cart: List<Product>,
-        discounts: List<Discount>,
-        scope: CoroutineScope,
-        liveData: MutableLiveData<List<CheckoutRow>>,
-    ) {
-        scope.launch {
-            computeCheckoutRows(cart, discounts)
-                .also { liveData.value = it }
-        }
-    }
-
-    private suspend fun computeCheckoutRows(
-        cart: List<Product>,
-        discounts: List<Discount>,
+        discountedProducts: List<DiscountedProduct>,
     ): List<CheckoutRow> = withContext(Dispatchers.Default) {
         val discountedRows = mutableListOf<CheckoutRow>()
         val nonDiscountedRows = mutableListOf<CheckoutRow>()
-        cart.groupBy { it.code }.values.forEach { productGroup ->
-            val discount = discounts.find {
-                it.productCode == productGroup.first().code
+        cart.groupBy { product -> product.code }.forEach { (productCode, productGroup) ->
+            val discount = discountedProducts.map {
+                it.discount
+            }.find {
+                it.productCode == productCode
             } ?: let {
                 nonDiscountedRows.add(
                     NonDiscountedCheckoutRow(
                         productGroup,
-                        productGroup.sumOf { it.price })
+                        productGroup.sumOf { it.price }
+                    )
                 )
                 return@forEach
             }

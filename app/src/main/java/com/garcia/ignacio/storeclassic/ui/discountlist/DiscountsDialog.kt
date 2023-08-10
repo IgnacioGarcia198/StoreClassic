@@ -55,6 +55,9 @@ class DiscountsDialog : DialogFragment() {
 
         initializeRecyclerView()
         observeViewModel()
+        if (savedInstanceState == null) {
+            viewModel.computeDiscountsForProduct(productCode)
+        }
     }
 
     private fun initializeRecyclerView() {
@@ -69,7 +72,6 @@ class DiscountsDialog : DialogFragment() {
             binding.productHeader.isVisible = !emptyDiscounts
             binding.discountHeader.isVisible = !emptyDiscounts
         }
-        viewModel.computeDiscountsForProduct(productCode)
     }
 
     override fun onDestroyView() {
