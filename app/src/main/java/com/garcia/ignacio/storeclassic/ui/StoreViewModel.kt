@@ -52,7 +52,7 @@ class StoreViewModel @Inject constructor(
     fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
     fun getAppEffect(): LiveData<Event<AppEffect>> = appEffect
 
-    private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
+    private var discounts: List<Discount> = emptyList()
     private val cart = mutableListOf<Product>()
     private var isConnectionAvailable = true
     private var updateJob: Job? = null
@@ -116,7 +116,7 @@ class StoreViewModel @Inject constructor(
 
     private fun getRepositoryDiscounts(): Flow<ResultList<List<Discount>>> =
         discountsRepository.discounts.onEach { result ->
-            discounts.value = result.result
+            discounts = result.result
             errorHandler.handleErrors(result.errors, ErrorType.DISCOUNT)
         }
 
@@ -139,7 +139,7 @@ class StoreViewModel @Inject constructor(
     }
 
     fun hasDiscounts(product: Product): Boolean =
-        discounts.value!!.any { it.isApplicableTo(product) }
+        discounts.any { it.isApplicableTo(product) }
 
     override fun reportErrors(errors: Set<ReportableError>) {
         val message = errors.joinToString("\n") { "- ${it.errorMessage}" }
