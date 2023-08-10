@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui.customview
+package com.garcia.ignacio.storeclassic.ui.view
 
 import android.content.Context
 import android.util.AttributeSet

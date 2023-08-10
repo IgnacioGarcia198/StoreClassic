@@ -37,7 +37,7 @@
         app:layout_constraintEnd_toStartOf="@id/addToCart"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <com.garcia.ignacio.storeclassic.ui.customview.AlwaysChangeSpinner
+    <com.garcia.ignacio.storeclassic.ui.view.AlwaysChangeSpinner
         android:id="@+id/addToCart"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
