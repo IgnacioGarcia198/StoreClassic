@@ -3,17 +3,17 @@ package com.garcia.ignacio.storeclassic.ui
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.map
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.common.ResultList
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
+import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Discount
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
-import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.ui.exceptions.ErrorReporter
 import com.garcia.ignacio.storeclassic.ui.exceptions.ReportableError
@@ -37,6 +37,7 @@ private const val ERROR_REPORT_HEADER = "ERROR REPORT\n\n"
 class StoreViewModel @Inject constructor(
     private val productsRepository: ProductsRepository,
     private val discountsRepository: DiscountsRepository,
+    private val discountedProductsRepository: DiscountedProductsRepository,
     private val errorHandler: ErrorHandler,
     private val helper: StoreViewModelHelper,
     private val connectivityMonitor: ConnectivityMonitor,
@@ -53,19 +54,27 @@ class StoreViewModel @Inject constructor(
     private val discounts: MutableLiveData<List<Discount>> = MutableLiveData(emptyList())
     private val cart: MutableLiveData<List<Product>> = MutableLiveData(emptyList())
 
-    private val discountedProducts: LiveData<List<DiscountedProduct>> by lazy {
-        helper.getDiscountedProducts(productsState, discounts, viewModelScope)
-    }
     val checkoutData: LiveData<List<CheckoutRow>> by lazy {
         helper.getCheckoutData(cart, discounts, viewModelScope)
     }
     private var isConnectionAvailable = true
     private var updateJob: Job? = null
 
-    fun getDiscountsForProduct(productCode: String? = null): LiveData<List<DiscountedProduct>> =
-        discountedProducts.map { list ->
-            productCode?.let { list.filter { it.product.code == productCode } } ?: list
-        }
+    private val discountsForCurrentProduct: MutableLiveData<List<DiscountedProduct>> =
+        MutableLiveData(emptyList())
+
+    fun getDiscountsForCurrentProduct(): LiveData<List<DiscountedProduct>> =
+        discountsForCurrentProduct
+
+    fun computeDiscountsForProduct(productCode: String? = null) {
+        discountedProductsRepository.findDiscountedProducts(
+            productCode?.let { setOf(productCode) } ?: emptySet()
+        ).onEach { result ->
+            discountsForCurrentProduct.value = result.result
+            errorHandler.handleErrors(result.errors, ErrorType.DISCOUNT)
+        }.launchIn(viewModelScope)
+    }
+
 
     fun clearCart() {
         cart.value = mutableListOf()

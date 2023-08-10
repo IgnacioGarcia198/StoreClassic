@@ -4,6 +4,7 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import com.garcia.ignacio.storeclassic.db.dao.DiscountDao
+import com.garcia.ignacio.storeclassic.db.dao.DiscountedProductDao
 import com.garcia.ignacio.storeclassic.db.dao.ProductDao
 import com.garcia.ignacio.storeclassic.db.models.DbDiscount
 import com.garcia.ignacio.storeclassic.db.models.DbProduct
@@ -16,4 +17,5 @@ import com.garcia.ignacio.storeclassic.db.models.DbProduct
 abstract class StoreDatabase : RoomDatabase() {
     abstract val productDao: ProductDao
     abstract val discountDao: DiscountDao
+    abstract val discountedProductDao: DiscountedProductDao
 }

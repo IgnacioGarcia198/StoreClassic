@@ -19,12 +19,12 @@ data class NetworkDiscount(
 
         Discount.XForY.TYPE ->
             Discount.XForY(
-                productCode = productCode!!,
+                productCode = productCode.orEmpty(),
                 productsBought = params.first().toInt(),
                 productsPaid = params[1].toInt()
             )
 
         else ->
-            Discount.Unimplemented(type, productCode, params)
+            Discount.Unimplemented(type, productCode.orEmpty(), params)
     }
 }

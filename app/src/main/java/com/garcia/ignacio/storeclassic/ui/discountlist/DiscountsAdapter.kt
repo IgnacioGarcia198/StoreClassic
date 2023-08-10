@@ -5,6 +5,7 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import com.garcia.ignacio.storeclassic.databinding.DiscountListItemBinding
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import javax.inject.Inject
 
 class DiscountsAdapter @Inject constructor() :

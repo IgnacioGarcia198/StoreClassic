@@ -1,7 +1,9 @@
 package com.garcia.ignacio.storeclassic.db.di
 
+import com.garcia.ignacio.storeclassic.data.local.DiscountedProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
+import com.garcia.ignacio.storeclassic.db.DiscountedProductsStorage
 import com.garcia.ignacio.storeclassic.db.DiscountsStorage
 import com.garcia.ignacio.storeclassic.db.ProductsStorage
 import dagger.Binds
@@ -22,4 +24,9 @@ interface LocalDataStoreModule {
     fun bindDiscountsLocalDataStore(
         storage: DiscountsStorage
     ): DiscountsLocalDataStore
+
+    @Binds
+    fun bindDiscountedProductsLocalDataStore(
+        storage: DiscountedProductsStorage
+    ): DiscountedProductsLocalDataStore
 }

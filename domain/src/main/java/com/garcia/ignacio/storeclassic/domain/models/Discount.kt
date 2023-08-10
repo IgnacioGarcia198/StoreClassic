@@ -1,9 +1,9 @@
 package com.garcia.ignacio.storeclassic.domain.models
 
-private val ALL_PRODUCTS: String? = null
+private val ALL_PRODUCTS: String = ""
 
 sealed class Discount {
-    abstract val productCode: String?
+    abstract val productCode: String
 
     fun apply(products: List<Product>): Double = when (productCode) {
         ALL_PRODUCTS -> applyToAll(products)
@@ -31,7 +31,7 @@ sealed class Discount {
     protected abstract fun applyDiscount(applicableProducts: List<Product>): Double
 
     fun isApplicableTo(product: Product): Boolean =
-        productCode == null || productCode == product.code
+        productCode.isBlank() || productCode == product.code
 
     data class XForY(
         override val productCode: String,
@@ -88,7 +88,7 @@ sealed class Discount {
 
     data class Unimplemented(
         val type: String,
-        override val productCode: String?,
+        override val productCode: String,
         val params: List<Double>,
     ) : Discount() {
         override fun partitionApplicableProducts(

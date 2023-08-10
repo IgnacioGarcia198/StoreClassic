@@ -1,29 +1,27 @@
 package com.garcia.ignacio.storeclassic.db.models
 
 import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 
 private const val DISCOUNTS_TABLE_NAME = "discounts"
 
-@Entity(tableName = DISCOUNTS_TABLE_NAME)
+@Entity(tableName = DISCOUNTS_TABLE_NAME, primaryKeys = ["type", "productCode"])
 data class DbDiscount(
     val type: String,
-    val productCode: String?,
+    val productCode: String,
     val params: List<Double>,
-    @PrimaryKey(autoGenerate = true) val id: Long = 0L,
 ) {
     fun toDomain(): Discount = when (type) {
         Discount.BuyInBulk.TYPE ->
             Discount.BuyInBulk(
-                productCode = productCode!!,
+                productCode = productCode,
                 minimumBought = params.first().toInt(),
                 discountPercent = params[1]
             )
 
         Discount.XForY.TYPE ->
             Discount.XForY(
-                productCode = productCode!!,
+                productCode = productCode,
                 productsBought = params.first().toInt(),
                 productsPaid = params[1].toInt()
             )

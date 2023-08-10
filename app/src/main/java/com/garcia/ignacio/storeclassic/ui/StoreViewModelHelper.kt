@@ -9,8 +9,6 @@ import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.ui.checkout.TotalCheckoutRow
-import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountedProduct
-import com.garcia.ignacio.storeclassic.ui.productlist.ProductsState
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -37,43 +35,6 @@ class StoreViewModelHelper @Inject constructor() {
             computeCheckoutData(cart, discounts, scope, mediator)
         }
         return mediator
-    }
-
-    fun getDiscountedProducts(
-        productsStateLiveData: LiveData<ProductsState>,
-        discountsLiveData: LiveData<List<Discount>>,
-        scope: CoroutineScope,
-    ): MediatorLiveData<List<DiscountedProduct>> {
-        val mediator = MediatorLiveData<List<DiscountedProduct>>(emptyList())
-        var productsState: ProductsState = ProductsState.Loading
-        var discounts: List<Discount> = emptyList()
-
-        mediator.addSource(productsStateLiveData) {
-            productsState = it
-            updateDiscountedProducts(
-                productsState, discounts, scope, mediator
-            )
-        }
-        mediator.addSource(discountsLiveData) {
-            discounts = it
-            updateDiscountedProducts(
-                productsState, discounts, scope, mediator
-            )
-        }
-        return mediator
-    }
-
-    private fun updateDiscountedProducts(
-        state: ProductsState,
-        discounts: List<Discount>,
-        scope: CoroutineScope,
-        liveData: MutableLiveData<List<DiscountedProduct>>,
-    ) {
-        scope.launch {
-            findDiscountedProducts(state, discounts).also {
-                liveData.value = it
-            }
-        }
     }
 
     private fun computeCheckoutData(
@@ -130,24 +91,6 @@ class StoreViewModelHelper @Inject constructor() {
                 discountedPercent = (1 - totalAmount / originalAmount) * 100
             )
             checkoutRows + totalRow
-        }
-    }
-
-    private suspend fun findDiscountedProducts(
-        state: ProductsState,
-        discounts: List<Discount>
-    ): List<DiscountedProduct> = withContext(Dispatchers.Default) {
-        when (state) {
-            is ProductsState.Ready ->
-                state.products.mapNotNull { product ->
-                    discounts.find { discount ->
-                        discount.isApplicableTo(product)
-                    }?.let {
-                        DiscountedProduct(product, it)
-                    }
-                }
-
-            else -> emptyList()
         }
     }
 }

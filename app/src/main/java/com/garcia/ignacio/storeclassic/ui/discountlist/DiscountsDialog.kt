@@ -62,13 +62,14 @@ class DiscountsDialog : DialogFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getDiscountsForProduct(productCode).observe(viewLifecycleOwner) { list ->
+        viewModel.getDiscountsForCurrentProduct().observe(viewLifecycleOwner) { list ->
             discountsAdapter.submitList(list)
             val emptyDiscounts = list.isEmpty()
             binding.noDiscountsText.isVisible = emptyDiscounts
             binding.productHeader.isVisible = !emptyDiscounts
             binding.discountHeader.isVisible = !emptyDiscounts
         }
+        viewModel.computeDiscountsForProduct(productCode)
     }
 
     override fun onDestroyView() {
