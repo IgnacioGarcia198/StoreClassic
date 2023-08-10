@@ -6,10 +6,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
+import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
-import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -42,8 +42,9 @@ class MainViewModel @Inject constructor(
 
     private fun startMonitoringErrors() {
         errorHandler.getErrors()
-            .onEach { reportErrors(it) }
-            .launchIn(viewModelScope)
+            .onEach { errors ->
+                if (errors.isNotEmpty()) { reportErrors(errors) }
+            }.launchIn(viewModelScope)
     }
 
     private fun startMonitoringNetworkConnection() {
