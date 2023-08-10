@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui.exceptions
+package com.garcia.ignacio.storeclassic.exceptions
 
 import android.app.Application
 import com.garcia.ignacio.storeclassic.BuildConfig

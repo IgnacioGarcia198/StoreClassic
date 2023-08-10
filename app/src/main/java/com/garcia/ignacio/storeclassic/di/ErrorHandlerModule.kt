@@ -1,7 +1,7 @@
 package com.garcia.ignacio.storeclassic.di
 
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
-import com.garcia.ignacio.storeclassic.ui.exceptions.StoreErrorHandler
+import com.garcia.ignacio.storeclassic.exceptions.StoreErrorHandler
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
