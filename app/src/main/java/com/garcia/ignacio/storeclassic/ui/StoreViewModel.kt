@@ -22,7 +22,6 @@ import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.garcia.ignacio.storeclassic.ui.productlist.ProductsEffect
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
@@ -46,6 +45,10 @@ class StoreViewModel @Inject constructor(
 ) : ViewModel(), ErrorReporter {
     private val productsState = MutableLiveData<ListState<DiscountedProduct>>(ListState.Loading)
     fun getProductsState(): LiveData<ListState<DiscountedProduct>> = productsState
+    private val discountsState = MutableLiveData<ListState<DiscountedProduct>>(ListState.Loading)
+    fun getDiscountsState(): LiveData<ListState<DiscountedProduct>> = discountsState
+    private val checkoutState = MutableLiveData<ListState<CheckoutRow>>(ListState.Loading)
+    fun getCheckoutState(): LiveData<ListState<CheckoutRow>> = checkoutState
     var pendingAddToCart: AddToCart? = null
         private set
     private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
@@ -54,19 +57,25 @@ class StoreViewModel @Inject constructor(
     fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
     private val cart = MutableStateFlow<List<Product>>(emptyList())
     private var isConnectionAvailable = true
+    private val discountsForProductCode = MutableStateFlow<String?>(null)
 
-    fun getDiscountsForProduct(
-        productCode: String? = null
-    ): Flow<List<DiscountedProduct>> =
-        discountedProductsRepository.findDiscountedProducts(
-            productCode?.let { setOf(productCode) } ?: emptySet()
-        ).map { result ->
-            result.onFailure {
-                errorHandler.handleErrors(listOf(it))
-            }.getOrDefault(emptyList())
-        }
+    fun getDiscountsForProduct(productCode: String? = null) {
+        discountsForProductCode.value = productCode
+    }
 
-    fun getCheckoutData(): Flow<List<CheckoutRow>> =
+    private fun initializeDiscountsForProduct() {
+        discountsForProductCode.flatMapLatest { productCode ->
+            discountedProductsRepository.findDiscountedProducts(
+                productCode?.let { setOf(productCode) } ?: emptySet()
+            ).map { result ->
+                result.onFailure {
+                    errorHandler.handleErrors(listOf(it))
+                }.getOrDefault(emptyList()).also { discountsState.value = ListState.Ready(it) }
+            }
+        }.launchIn(viewModelScope)
+    }
+
+    private fun initializeCheckoutData() {
         cart.flatMapLatest { cart ->
             discountedProductsRepository.findDiscountedProducts(
                 cart.map { it.code }.toSet()
@@ -75,17 +84,19 @@ class StoreViewModel @Inject constructor(
                     helper.computeCheckoutData(cart, it)
                 }.onFailure {
                     errorHandler.handleErrors(listOf(it))
-                }.getOrDefault(emptyList())
+                }.getOrDefault(emptyList()).also { checkoutState.value = ListState.Ready(it) }
             }
-        }
+        }.launchIn(viewModelScope)
+    }
 
-    fun getAllProductsWithDiscountsIfAny() =
+    private fun initializeAllProductsWithDiscountsIfAny() {
         discountedProductsRepository.getAllProductsWithDiscountsIfAny().map { result ->
             result.onFailure {
                 errorHandler.handleErrors(listOf(it))
             }.getOrDefault(emptyList())
                 .also { productsState.value = ListState.Ready(it) }
         }.launchIn(viewModelScope)
+    }
 
     fun clearCart() {
         cart.value = emptyList()
@@ -93,6 +104,9 @@ class StoreViewModel @Inject constructor(
 
     init {
         errorHandler.errorReporter = this
+        initializeAllProductsWithDiscountsIfAny()
+        initializeCheckoutData()
+        initializeDiscountsForProduct()
         startMonitoringNetworkConnection()
         updateDataFromNetwork()
     }
@@ -100,6 +114,8 @@ class StoreViewModel @Inject constructor(
     private fun updateDataFromNetwork() {
         viewModelScope.launch {
             productsState.value = ListState.Loading
+            discountsState.value = ListState.Loading
+            checkoutState.value = ListState.Loading
             updateDiscountsFromNetwork()
             updateProductsFromNetwork()
         }

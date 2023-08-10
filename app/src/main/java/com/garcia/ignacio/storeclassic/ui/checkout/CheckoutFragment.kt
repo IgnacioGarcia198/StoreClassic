@@ -7,13 +7,11 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
 import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
+import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -50,9 +48,30 @@ class CheckoutFragment : Fragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getCheckoutData().onEach {
-            renderCheckoutData(it)
-        }.launchIn(lifecycleScope)
+        viewModel.getCheckoutState().observe(viewLifecycleOwner) {
+            renderState(it)
+        }
+    }
+
+    private fun renderState(state: ListState<CheckoutRow>) {
+        when (state) {
+            ListState.Loading -> {
+                showLoading()
+            }
+
+            is ListState.Ready -> {
+                hideLoading()
+                renderCheckoutData(state.list)
+            }
+        }
+    }
+
+    private fun hideLoading() {
+        binding.loading.hide()
+    }
+
+    private fun showLoading() {
+        binding.loading.show()
     }
 
     private fun renderCheckoutData(checkoutData: List<CheckoutRow>) {

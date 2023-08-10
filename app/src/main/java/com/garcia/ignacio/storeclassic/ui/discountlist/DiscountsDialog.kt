@@ -9,14 +9,12 @@ import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.activityViewModels
-import androidx.lifecycle.lifecycleScope
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.DialogDiscountsBinding
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.StoreViewModel
+import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @AndroidEntryPoint
@@ -59,6 +57,9 @@ class DiscountsDialog : DialogFragment() {
 
         initializeRecyclerView()
         observeViewModel()
+        if (savedInstanceState == null) {
+            viewModel.getDiscountsForProduct(productCode)
+        }
     }
 
     private fun initializeRecyclerView() {
@@ -66,10 +67,30 @@ class DiscountsDialog : DialogFragment() {
     }
 
     private fun observeViewModel() {
-        viewModel.getDiscountsForProduct(productCode)
-            .onEach {
-                renderDiscounts(it)
-            }.launchIn(lifecycleScope)
+        viewModel.getDiscountsState().observe(viewLifecycleOwner) {
+            renderState(it)
+        }
+    }
+
+    private fun renderState(state: ListState<DiscountedProduct>) {
+        when (state) {
+            ListState.Loading -> {
+                showLoading()
+            }
+
+            is ListState.Ready -> {
+                hideLoading()
+                renderDiscounts(state.list)
+            }
+        }
+    }
+
+    private fun hideLoading() {
+        binding.loading.hide()
+    }
+
+    private fun showLoading() {
+        binding.loading.show()
     }
 
     private fun renderDiscounts(list: List<DiscountedProduct>) {

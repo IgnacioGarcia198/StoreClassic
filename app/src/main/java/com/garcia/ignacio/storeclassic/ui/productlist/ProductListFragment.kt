@@ -84,9 +84,6 @@ class ProductListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeRecyclerView()
         observeViewModel()
-        if (savedInstanceState == null) {
-            viewModel.getAllProductsWithDiscountsIfAny()
-        }
         binding.checkoutFab.setOnClickListener {
             viewModel.goToCheckout()
         }
@@ -169,12 +166,10 @@ class ProductListFragment : Fragment() {
 
     private fun hideLoading() {
         binding.loading.hide()
-        binding.loadingText.isVisible = false
     }
 
     private fun showLoading() {
         binding.loading.show()
-        binding.loadingText.isVisible = true
     }
 
     private fun showAddToCartConfirmationDialog(product: Product, quantity: Int) {

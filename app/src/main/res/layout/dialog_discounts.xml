@@ -60,4 +60,14 @@
         android:orientation="vertical"
         app:layout_constraintGuide_percent="0.5" />
 
+    <com.garcia.ignacio.storeclassic.ui.view.MessageProgressBar
+        android:id="@+id/loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="visible"/>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
