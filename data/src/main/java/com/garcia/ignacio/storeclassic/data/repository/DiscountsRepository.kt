@@ -12,11 +12,10 @@ import com.garcia.ignacio.storeclassic.domain.models.Discount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flatMapConcat
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -26,28 +25,28 @@ class DiscountsRepository @Inject constructor(
     private val localDataStore: DiscountsLocalDataStore,
     private val connectivityMonitor: ConnectivityMonitor,
 ) {
-    private val errorStateFlow = MutableStateFlow(mutableListOf<Throwable>())
+    private val errors = mutableListOf<Throwable>()
 
     private val discountsFlow: Flow<List<Discount>> =
         storeClient.getDiscounts().onEach {
-            errorStateFlow.value.clear()
+            errors.clear()
         }.catch {
             val exception =
                 if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
                 else StoreException.DeviceOffline(it)
-            errorStateFlow.value = mutableListOf(exception)
+            errors.add(exception)
             emit(emptyList())
         }.onEach { discounts ->
             val (unimplemented, valid) = discounts.partition { it is Discount.Unimplemented }
-            unimplemented.forEach { errorStateFlow.value.add(UnimplementedDiscount(it)) }
+            unimplemented.forEach { errors.add(UnimplementedDiscount(it)) }
             if (valid.isNotEmpty()) localDataStore.updateDiscounts(valid)
         }.catch {
-            errorStateFlow.value.add(stageException(Stage.DB_WRITE, it))
+            errors.add(stageException(Stage.DB_WRITE, it))
             emit(emptyList())
         }.flatMapConcat {
             localDataStore.getAllDiscounts()
         }.catch {
-            errorStateFlow.value.add(stageException(Stage.DB_READ, it))
+            errors.add(stageException(Stage.DB_READ, it))
             emit(emptyList())
         }
 
@@ -61,7 +60,7 @@ class DiscountsRepository @Inject constructor(
     )
 
     val discounts: Flow<ResultList<List<Discount>>> =
-        discountsFlow.combine(errorStateFlow) { list, errors ->
+        discountsFlow.map { list ->
             ResultList(list, errors)
         }.flowOn(Dispatchers.IO)
 }
