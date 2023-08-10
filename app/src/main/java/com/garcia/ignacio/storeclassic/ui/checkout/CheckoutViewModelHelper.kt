@@ -1,11 +1,7 @@
-package com.garcia.ignacio.storeclassic.ui
+package com.garcia.ignacio.storeclassic.ui.checkout
 
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutRow
-import com.garcia.ignacio.storeclassic.ui.checkout.DiscountedCheckoutRow
-import com.garcia.ignacio.storeclassic.ui.checkout.NonDiscountedCheckoutRow
-import com.garcia.ignacio.storeclassic.ui.checkout.TotalCheckoutRow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject

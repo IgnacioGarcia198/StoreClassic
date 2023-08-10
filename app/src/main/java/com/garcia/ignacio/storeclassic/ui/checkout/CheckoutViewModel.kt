@@ -6,7 +6,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.CheckoutViewModelHelper
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import com.garcia.ignacio.storeclassic.ui.model.UiProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
