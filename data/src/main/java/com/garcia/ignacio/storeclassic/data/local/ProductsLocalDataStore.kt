@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface ProductsLocalDataStore {
     fun getAllProducts(): Flow<List<Product>>
-    fun updateProducts(products: List<Product>)
+    suspend fun updateProducts(products: List<Product>)
 }

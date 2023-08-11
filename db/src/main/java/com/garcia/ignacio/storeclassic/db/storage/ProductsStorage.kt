@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.db
+package com.garcia.ignacio.storeclassic.db.storage
 
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
@@ -15,7 +15,7 @@ class ProductsStorage @Inject constructor(
         products.map { it.toDomain() }
     }
 
-    override fun updateProducts(products: List<Product>) {
+    override suspend fun updateProducts(products: List<Product>) {
         productDao.insertAll(products.map { it.toDbProduct() })
     }
 }

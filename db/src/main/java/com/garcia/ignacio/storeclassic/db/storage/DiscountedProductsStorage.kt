@@ -1,8 +1,7 @@
-package com.garcia.ignacio.storeclassic.db
+package com.garcia.ignacio.storeclassic.db.storage
 
 import com.garcia.ignacio.storeclassic.data.local.DiscountedProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.db.dao.DiscountedProductDao
-import com.garcia.ignacio.storeclassic.db.models.DbDiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map

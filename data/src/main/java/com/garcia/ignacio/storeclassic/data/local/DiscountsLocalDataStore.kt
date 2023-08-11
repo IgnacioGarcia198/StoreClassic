@@ -5,5 +5,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface DiscountsLocalDataStore {
     fun getAllDiscounts(): Flow<List<Discount>>
-    fun updateDiscounts(discounts: List<Discount>)
+    suspend fun updateDiscounts(discounts: List<Discount>)
 }

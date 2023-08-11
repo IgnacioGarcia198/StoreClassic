@@ -1,4 +1,4 @@
-package com.garcia.ignacio.storeclassic.db
+package com.garcia.ignacio.storeclassic.db.storage
 
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
 import com.garcia.ignacio.storeclassic.db.dao.DiscountDao
@@ -15,7 +15,7 @@ class DiscountsStorage @Inject constructor(
         discounts.map { it.toDomain() }
     }
 
-    override fun updateDiscounts(discounts: List<Discount>) {
+    override suspend fun updateDiscounts(discounts: List<Discount>) {
         discountDao.insertAll(discounts.map { it.toDbDiscount() })
     }
 }

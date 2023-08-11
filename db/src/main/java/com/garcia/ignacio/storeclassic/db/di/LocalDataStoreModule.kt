@@ -3,9 +3,9 @@ package com.garcia.ignacio.storeclassic.db.di
 import com.garcia.ignacio.storeclassic.data.local.DiscountedProductsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.local.ProductsLocalDataStore
-import com.garcia.ignacio.storeclassic.db.DiscountedProductsStorage
-import com.garcia.ignacio.storeclassic.db.DiscountsStorage
-import com.garcia.ignacio.storeclassic.db.ProductsStorage
+import com.garcia.ignacio.storeclassic.db.storage.DiscountedProductsStorage
+import com.garcia.ignacio.storeclassic.db.storage.DiscountsStorage
+import com.garcia.ignacio.storeclassic.db.storage.ProductsStorage
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn

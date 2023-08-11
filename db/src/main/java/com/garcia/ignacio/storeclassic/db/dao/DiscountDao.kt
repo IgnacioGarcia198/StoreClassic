@@ -13,5 +13,5 @@ interface DiscountDao {
     fun getAll(): Flow<List<DbDiscount>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertAll(products: List<DbDiscount>)
+    suspend fun insertAll(products: List<DbDiscount>)
 }
