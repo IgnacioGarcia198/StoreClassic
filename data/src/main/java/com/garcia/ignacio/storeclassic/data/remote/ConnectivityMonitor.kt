@@ -1,9 +1,9 @@
 package com.garcia.ignacio.storeclassic.data.remote
 
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.SharedFlow
 
 interface ConnectivityMonitor {
-    val isNetworkConnectedFlow: StateFlow<Boolean>
+    val isNetworkConnectedFlow: SharedFlow<Boolean>
 
     val isNetworkConnected: Boolean
 
