@@ -37,6 +37,15 @@ class DiscountTest {
     }
 
     @Test
+    fun `XForY discount is not applied if productsBought is 0`() {
+        val discount = Discount.XForY(PRODUCT_CODE, 0, 1)
+        val products = (1..4).map { testProduct() }
+
+
+        assertEquals(PRODUCT_PRICE * 4, discount.apply(products))
+    }
+
+    @Test
     fun `XForY partitionApplicableProducts() partitions items with different product code`() {
         val discount = Discount.XForY(PRODUCT_CODE, 2, 1)
         val products = (1..4).map { testProduct() } + testProduct("")

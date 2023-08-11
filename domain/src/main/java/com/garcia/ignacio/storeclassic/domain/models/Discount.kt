@@ -20,7 +20,8 @@ sealed class Discount {
     ) : Discount() {
         override fun applyDiscount(applicableProducts: List<Product>): Double {
             val originalPrice = applicableProducts.first().price
-            return applicableProducts.size * originalPrice * productsPaid / productsBought
+            return applicableProducts.size * originalPrice * productsPaid /
+                    if (productsBought > 0) productsBought else 1
         }
 
         override fun partitionApplicableProducts(
