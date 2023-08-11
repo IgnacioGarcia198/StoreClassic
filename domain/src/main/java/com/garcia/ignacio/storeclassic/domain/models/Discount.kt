@@ -52,8 +52,10 @@ sealed class Discount {
         override fun partitionApplicableProducts(
             products: List<Product>
         ): Pair<List<Product>, List<Product>> =
-            if (products.size >= minimumBought) products to emptyList()
-            else emptyList<Product>() to products
+            products.partition { it.code == productCode }.let { (applicable, nonApplicable) ->
+                if (applicable.size >= minimumBought) applicable to nonApplicable
+                else emptyList<Product>() to applicable + nonApplicable
+            }
 
         companion object {
             const val TYPE = "BuyInBulk"
