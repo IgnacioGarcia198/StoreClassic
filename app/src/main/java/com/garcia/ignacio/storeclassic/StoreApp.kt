@@ -14,6 +14,7 @@ class StoreApp: Application() {
     override fun onCreate() {
         super.onCreate()
         if (BuildConfig.DEBUG) {
+            com.garcia.ignacio.storeclassic.common.buildconfig.BuildConfig.setDebugOnStartup()
             Timber.plant(Timber.DebugTree())
         }
         storeDataUpdater.initialize()
