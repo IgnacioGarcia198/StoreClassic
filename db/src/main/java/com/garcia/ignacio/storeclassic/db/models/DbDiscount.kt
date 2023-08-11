@@ -1,8 +1,6 @@
 package com.garcia.ignacio.storeclassic.db.models
 
 import androidx.room.Entity
-import com.garcia.ignacio.storeclassic.common.buildconfig.BuildConfig
-import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 
 private const val DISCOUNTS_TABLE_NAME = "discounts"
@@ -17,15 +15,15 @@ data class DbDiscount(
         Discount.BuyInBulk.TYPE ->
             Discount.BuyInBulk(
                 productCode = productCode,
-                minimumBought = params.getOrThrowInDebug(0, 0.0).toInt(),
-                discountPercent = params.getOrThrowInDebug(1, 0.0)
+                minimumBought = params.getOrElse(0) { 0.0 }.toInt(),
+                discountPercent = params.getOrElse(1) { 0.0 }
             )
 
         Discount.XForY.TYPE ->
             Discount.XForY(
                 productCode = productCode,
-                productsBought = params.getOrThrowInDebug(0, 0.0).toInt(),
-                productsPaid = params.getOrThrowInDebug(1, 0.0).toInt()
+                productsBought = params.firstOrNull()?.toInt() ?: 0,
+                productsPaid = params.getOrElse(1) { 0.0 }.toInt()
             )
 
         else ->
@@ -55,10 +53,3 @@ fun Discount.toDbDiscount(): DbDiscount = when (this) {
             params = params
         )
 }
-
-private fun <T> List<T>.getOrThrowInDebug(position: Int, default: T): T =
-    getOrNull(position) ?: if (BuildConfig.DEBUG)
-        throw StoreException.Misusing(
-            "Position $position is not available in this Discount params, format in db is wrong"
-        )
-    else default

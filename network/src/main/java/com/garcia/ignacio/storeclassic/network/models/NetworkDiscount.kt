@@ -1,7 +1,6 @@
 package com.garcia.ignacio.storeclassic.network.models
 
-import com.garcia.ignacio.storeclassic.common.buildconfig.BuildConfig
-import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
+import com.garcia.ignacio.storeclassic.data.exceptions.assertOnDebug
 import com.garcia.ignacio.storeclassic.domain.models.Discount
 import kotlinx.serialization.Serializable
 
@@ -12,28 +11,28 @@ data class NetworkDiscount(
     val params: List<Double>,
 ) {
     fun toDomain(): Discount = when (type) {
-        Discount.BuyInBulk.TYPE ->
+        Discount.BuyInBulk.TYPE -> {
+            assertOnDebug("need 2 params") { params.size < 2 }
             Discount.BuyInBulk(
                 productCode = productCode.orEmpty(),
-                minimumBought = params.getOrThrowInDebug(0, 0.0).toInt(),
-                discountPercent = params.getOrThrowInDebug(1, 0.0)
+                minimumBought = params.getOrElse(0) { 0.0 }.toInt(),
+                discountPercent = params.getOrElse(1) { 0.0 }
             )
+        }
 
-        Discount.XForY.TYPE ->
+        Discount.XForY.TYPE -> {
+            assertOnDebug("need 2 params") { params.size >= 2 }
+            assertOnDebug("productsBought cannot be smaller than productsPaid") {
+                params.first() > params[1]
+            }
             Discount.XForY(
                 productCode = productCode.orEmpty(),
-                productsBought = params.getOrThrowInDebug(0, 0.0).toInt(),
-                productsPaid = params.getOrThrowInDebug(1, 0.0).toInt()
+                productsBought = params.firstOrNull()?.toInt() ?: 0,
+                productsPaid = params.getOrElse(1) { 0.0 }.toInt()
             )
+        }
 
         else ->
             Discount.Unimplemented(type, productCode.orEmpty(), params)
     }
 }
-
-private fun <T> List<T>.getOrThrowInDebug(position: Int, default: T): T =
-    getOrNull(position) ?: if (BuildConfig.DEBUG)
-        throw StoreException.Misusing(
-            "Position $position is not available in this Discount params, wrong format came from network"
-        )
-    else default
