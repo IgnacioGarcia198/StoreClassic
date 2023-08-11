@@ -20,4 +20,5 @@ dependencies {
     implementation libs.jakewharton.timber
 
     testImplementation libs.junit
+    testImplementation libs.io.ktor.client.mock
 }
