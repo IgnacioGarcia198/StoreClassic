@@ -21,4 +21,5 @@ dependencies {
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.androidx.room.testing
     testImplementation libs.org.robolectric
+    testImplementation libs.io.mockk.mockk
 }
