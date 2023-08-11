@@ -18,21 +18,23 @@ class DiscountsRepository @Inject constructor(
     private val connectivityMonitor: ConnectivityMonitor,
     private val errorHandler: ErrorHandler,
 ) {
-    suspend fun updateDiscounts(): Result<Unit> = withContext(Dispatchers.IO) {
-        storeClient.getDiscounts()
-            .mapError {
-                if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
-                else StoreException.DeviceOffline(it)
-            }.map {
-                if (it.isNotEmpty()) localDataStore.updateDiscounts(it)
-            }.mapError { throwable ->
-                when (throwable) {
-                    is StoreException -> throwable
-                    else -> stageException(Stage.DB_WRITE, throwable)
-                }.also {
-                    errorHandler.handleErrors(listOf(it))
+    suspend fun updateDiscounts() {
+        withContext(Dispatchers.IO) {
+            storeClient.getDiscounts()
+                .mapError {
+                    if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
+                    else StoreException.DeviceOffline(it)
+                }.map {
+                    if (it.isNotEmpty()) localDataStore.updateDiscounts(it)
+                }.mapError { throwable ->
+                    when (throwable) {
+                        is StoreException -> throwable
+                        else -> stageException(Stage.DB_WRITE, throwable)
+                    }.also {
+                        errorHandler.handleErrors(listOf(it))
+                    }
                 }
-            }
+        }
     }
 
     private fun stageException(

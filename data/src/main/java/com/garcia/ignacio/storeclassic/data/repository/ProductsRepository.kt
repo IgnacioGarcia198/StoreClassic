@@ -18,21 +18,23 @@ class ProductsRepository @Inject constructor(
     private val connectivityMonitor: ConnectivityMonitor,
     private val errorHandler: ErrorHandler,
 ) {
-    suspend fun updateProducts(): Result<Unit> = withContext(Dispatchers.IO) {
-        storeClient.getProducts()
-            .mapError {
-                if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
-                else StoreException.DeviceOffline(it)
-            }.map {
-                if (it.isNotEmpty()) localDataStore.updateProducts(it)
-            }.mapError { throwable ->
-                when (throwable) {
-                    is StoreException -> throwable
-                    else -> stageException(Stage.DB_WRITE, throwable)
-                }.also {
-                    errorHandler.handleErrors(listOf(it))
+    suspend fun updateProducts() {
+        withContext(Dispatchers.IO) {
+            storeClient.getProducts()
+                .mapError {
+                    if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
+                    else StoreException.DeviceOffline(it)
+                }.map {
+                    if (it.isNotEmpty()) localDataStore.updateProducts(it)
+                }.mapError { throwable ->
+                    when (throwable) {
+                        is StoreException -> throwable
+                        else -> stageException(Stage.DB_WRITE, throwable)
+                    }.also {
+                        errorHandler.handleErrors(listOf(it))
+                    }
                 }
-            }
+        }
     }
 
     private fun stageException(

@@ -18,19 +18,15 @@ class DiscountedProductsRepository @Inject constructor(
 
     fun findDiscountedProducts(
         productCodes: Set<String>
-    ): Flow<Result<List<DiscountedProduct>>> =
+    ): Flow<List<DiscountedProduct>> =
         localDataStore.findDiscountedProducts(
             productCodes
-        ).map {
-            Result.success(it)
-        }.catch {
+        ).catch {
             errorHandler.handleErrors(listOf(StoreException.ErrorRetrievingDiscountedProducts(it)))
         }.flowOn(Dispatchers.IO)
 
-    fun getAllProductsWithDiscountsIfAny(): Flow<Result<List<DiscountedProduct>>> =
-        localDataStore.getAllProductsAndDiscountIfAny().map {
-            Result.success(it)
-        }.catch {
+    fun getAllProductsWithDiscountsIfAny(): Flow<List<DiscountedProduct>> =
+        localDataStore.getAllProductsAndDiscountIfAny().catch {
             errorHandler.handleErrors(listOf(StoreException.ErrorRetrievingDiscountedProducts(it)))
         }.flowOn(Dispatchers.IO)
 }

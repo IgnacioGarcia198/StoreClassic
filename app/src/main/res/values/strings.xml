@@ -54,8 +54,9 @@
     <string name="checkout_header_amount">Amount</string>
     <string name="checkout_header_discount">Discount</string>
     <string name="checkout_clear_shopping_cart_action">Clear shopping cart</string>
-    <string name="device_offline_user_feedback">Your device seems to be offline. You may see products and discounts if they are available locally, but you will need to wait for the connection to be restored to make purchases.</string>
+    <string name="device_offline_user_feedback">Could not retrieve data from network. Your device seems to be offline. You may see products and discounts if they are available locally, but you will need to wait for the connection to be restored to make purchases.</string>
     <string name="connection_restored_feedback">Internet connection has been restored.</string>
+    <string name="connection_lost_feedback">Your device seems to be offline. You may see products and discounts if they are available locally, but you will need to wait for the connection to be restored to make purchases.</string>
     <string name="retrieve_discounted_products_error_user_feedback">There was an error getting discounted products</string>
 
     <string name="retrieving_data">Retrieving data…</string>

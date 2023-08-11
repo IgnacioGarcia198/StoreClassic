@@ -13,8 +13,8 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import com.garcia.ignacio.storeclassic.R
-import com.garcia.ignacio.storeclassic.databinding.ActivityMainBinding
 import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
+import com.garcia.ignacio.storeclassic.databinding.ActivityMainBinding
 import com.garcia.ignacio.storeclassic.ui.productlist.AppEffect
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
@@ -62,10 +62,23 @@ class MainActivity : AppCompatActivity() {
             AppEffect.ConnectionRestored ->
                 showConnectionRestoredFeedback()
 
-            else -> {
-                // NOP
-            }
+            AppEffect.ConnectionLost ->
+                showConnectionLostFeedback()
+            AppEffect.Idle -> {}
         }
+    }
+
+    private fun showConnectionLostFeedback() {
+        val feedbackText = getString(R.string.connection_lost_feedback)
+        Snackbar.make(binding.root, feedbackText, Snackbar.LENGTH_SHORT)
+            .setTextColor(ContextCompat.getColor(this, R.color.white))
+            .setTextMaxLines(ERROR_FEEDBACK_MAX_LINES)
+            .setBackgroundTint(
+                ContextCompat.getColor(
+                    this,
+                    R.color.errorFeedbackBackground
+                )
+            ).show()
     }
 
     private fun showConnectionRestoredFeedback() {

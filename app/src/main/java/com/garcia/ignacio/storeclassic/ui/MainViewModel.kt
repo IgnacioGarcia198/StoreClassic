@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
-import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
@@ -43,16 +42,24 @@ class MainViewModel @Inject constructor(
     private fun startMonitoringErrors() {
         errorHandler.getErrors()
             .onEach { errors ->
-                if (errors.isNotEmpty()) { reportErrors(errors) }
+                if (errors.isNotEmpty()) {
+                    reportErrors(errors)
+                }
             }.launchIn(viewModelScope)
     }
 
     private fun startMonitoringNetworkConnection() {
         connectivityMonitor.isNetworkConnectedFlow
             .onEach { isConnected ->
-                if (!wasConnected && isConnected) {
-                    appEffect.value = Event(AppEffect.ConnectionRestored)
-                    updateDataFromNetwork()
+                when {
+                    !wasConnected && isConnected -> {
+                        appEffect.value = Event(AppEffect.ConnectionRestored)
+                        updateDataFromNetwork()
+                    }
+
+                    wasConnected && !isConnected -> {
+                        appEffect.value = Event(AppEffect.ConnectionLost)
+                    }
                 }
                 wasConnected = isConnected
             }.launchIn(viewModelScope)
@@ -66,15 +73,11 @@ class MainViewModel @Inject constructor(
     }
 
     private suspend fun updateProductsFromNetwork() {
-        productsRepository.updateProducts().onFailure {
-            errorHandler.handleErrors(listOf(it), ErrorType.PRODUCT)
-        }
+        productsRepository.updateProducts()
     }
 
     private suspend fun updateDiscountsFromNetwork() {
-        discountsRepository.updateDiscounts().onFailure {
-            errorHandler.handleErrors(listOf(it), ErrorType.DISCOUNT)
-        }
+        discountsRepository.updateDiscounts()
     }
 
     private fun reportErrors(errors: Set<ReportableError>) {
