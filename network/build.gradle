@@ -17,6 +17,7 @@ dependencies {
     implementation libs.dagger.hilt.android
     kapt libs.dagger.hilt.compiler
     implementation libs.kotlinx.serialization.json
+    implementation libs.jakewharton.timber
 
     testImplementation libs.junit
 }

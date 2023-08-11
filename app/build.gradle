@@ -60,6 +60,7 @@ dependencies {
     implementation libs.androidx.navigation.ui
     implementation libs.dagger.hilt.android
     kapt libs.dagger.hilt.compiler
+    implementation libs.jakewharton.timber
 
     testImplementation libs.junit
     androidTestImplementation libs.androidx.test.ext.junit
