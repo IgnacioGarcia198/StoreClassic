@@ -10,6 +10,8 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import io.ktor.client.engine.HttpClientEngine
+import io.ktor.client.engine.android.Android
 import javax.inject.Singleton
 
 @Suppress("unused")
@@ -24,5 +26,9 @@ interface NetworkModule {
         @Provides
         fun provideConnectivityMonitor(application: Application): ConnectivityMonitor =
             StoreConnectivityMonitor(application)
+
+        @Provides
+        fun provideHttpClientEngine(): HttpClientEngine = Android.create()
+
     }
 }

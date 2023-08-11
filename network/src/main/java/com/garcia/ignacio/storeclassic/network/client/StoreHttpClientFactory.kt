@@ -1,8 +1,9 @@
 package com.garcia.ignacio.storeclassic.network.client
 
 import io.ktor.client.HttpClient
-import io.ktor.client.engine.android.Android
+import io.ktor.client.engine.HttpClientEngine
 import io.ktor.client.plugins.DefaultRequest
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logger
 import io.ktor.client.plugins.logging.Logging
@@ -13,15 +14,19 @@ import io.ktor.http.HttpHeaders
 import timber.log.Timber
 import javax.inject.Inject
 
-private const val TIMEOUT = 60_000
+private const val CONNECTION_TIMEOUT = 60_000L
+private const val REQUEST_TIMEOUT = 3000L
 
-class StoreHttpClientFactory @Inject constructor() {
-    fun createStoreHttpClient(): HttpClient = HttpClient(Android) {
+class StoreHttpClientFactory @Inject constructor(
+    private val engine: HttpClientEngine
+) {
+    fun createStoreHttpClient(): HttpClient = HttpClient(engine) {
         expectSuccess = true
 
-        engine {
-            connectTimeout = TIMEOUT
-            socketTimeout = TIMEOUT
+        install(HttpTimeout) {
+            requestTimeoutMillis = REQUEST_TIMEOUT
+            connectTimeoutMillis = CONNECTION_TIMEOUT
+            socketTimeoutMillis = CONNECTION_TIMEOUT
         }
 
         install(Logging) {
