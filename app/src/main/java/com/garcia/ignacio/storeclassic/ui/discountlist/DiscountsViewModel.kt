@@ -28,12 +28,8 @@ class DiscountsViewModel @Inject constructor(
     private fun initializeDiscountsForProduct(productCode: String?) {
         discountedProductsRepository.findDiscountedProducts(
             productCode?.let { setOf(productCode) } ?: emptySet()
-        ).map { result ->
-            result.getOrDefault(
-                emptyList()
-            ).also {
-                discountsState.value = ListState.Ready(it)
-            }
+        ).map {
+            discountsState.value = ListState.Ready(it)
         }.launchIn(viewModelScope)
     }
 

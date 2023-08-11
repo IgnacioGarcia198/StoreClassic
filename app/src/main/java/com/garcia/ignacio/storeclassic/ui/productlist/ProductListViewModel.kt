@@ -61,9 +61,8 @@ class ProductListViewModel @Inject constructor(
     }
 
     private fun initializeAllProductsWithDiscountsIfAny() {
-        discountedProductsRepository.getAllProductsWithDiscountsIfAny().map { result ->
-            result.getOrDefault(emptyList())
-                .also { productsState.value = ListState.Ready(it) }
+        discountedProductsRepository.getAllProductsWithDiscountsIfAny().map {
+            productsState.value = ListState.Ready(it)
         }.launchIn(viewModelScope)
     }
 

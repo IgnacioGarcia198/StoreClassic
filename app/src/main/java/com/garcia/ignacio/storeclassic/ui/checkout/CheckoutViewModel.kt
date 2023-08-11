@@ -41,12 +41,8 @@ class CheckoutViewModel @Inject constructor(
         cart.flatMapLatest { cart ->
             discountedProductsRepository.findDiscountedProducts(
                 cart.map { it.code }.toSet()
-            ).map { result ->
-                result.map {
-                    helper.computeCheckoutData(cart, it)
-                }.getOrDefault(
-                    emptyList()
-                ).also {
+            ).map { list ->
+                helper.computeCheckoutData(cart, list).also {
                     checkoutState.value = ListState.Ready(it)
                 }
             }
