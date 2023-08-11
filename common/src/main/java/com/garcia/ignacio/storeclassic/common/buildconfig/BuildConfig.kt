@@ -4,7 +4,7 @@ object BuildConfig {
     var DEBUG = false
         private set
 
-    fun setDebugOnStartup() {
-        DEBUG = true
+    fun setDebugOnStartup(debug: Boolean = true) {
+        DEBUG = debug
     }
 }

@@ -6,13 +6,13 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class NetworkDiscount(
-    val type: String,
+    val type: String?,
     val productCode: String?,
     val params: List<Double>,
 ) {
     fun toDomain(): Discount = when (type) {
         Discount.BuyInBulk.TYPE -> {
-            assertOnDebug("need 2 params") { params.size < 2 }
+            assertOnDebug("need 2 params") { params.size >= 2 }
             Discount.BuyInBulk(
                 productCode = productCode.orEmpty(),
                 minimumBought = params.getOrElse(0) { 0.0 }.toInt(),
@@ -33,6 +33,6 @@ data class NetworkDiscount(
         }
 
         else ->
-            Discount.Unimplemented(type, productCode.orEmpty(), params)
+            Discount.Unimplemented(type.orEmpty(), productCode.orEmpty(), params)
     }
 }
