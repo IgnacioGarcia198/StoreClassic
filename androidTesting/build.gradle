@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.kapt)
 }
 
 android {
@@ -8,6 +9,8 @@ android {
 }
 
 dependencies {
-    api libs.kotlinx.coroutines.test
+    implementation libs.dagger
+    kapt libs.dagger.compiler
+    implementation libs.kotlinx.coroutines.test
     implementation libs.junit
 }
