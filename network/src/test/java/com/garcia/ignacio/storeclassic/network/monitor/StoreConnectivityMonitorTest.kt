@@ -2,7 +2,7 @@ package com.garcia.ignacio.storeclassic.network.monitor
 
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.garcia.ignacio.storeclassic.androidtesting.TestDispatcherRule
+import com.garcia.ignacio.storeclassic.androidtesting.CoroutineTestRule
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -19,7 +19,7 @@ import org.junit.Test
 
 class StoreConnectivityMonitorTest {
     @get: Rule
-    val dispatcherRule = TestDispatcherRule()
+    val coroutineTestRule = CoroutineTestRule()
     private val networkCallbackSlot = slot<ConnectivityManager.NetworkCallback>()
     private val connectivityManager: ConnectivityManager = mockk(relaxed = true) {
         captureCallback()
@@ -121,7 +121,7 @@ class StoreConnectivityMonitorTest {
     private fun observeNetworkConnectedFlow() {
         monitor.isNetworkConnectedFlow.onEach {
             connectedStates.add(it)
-        }.launchIn(CoroutineScope(dispatcherRule.testDispatcher))
+        }.launchIn(CoroutineScope(coroutineTestRule.testDispatcher))
     }
 
     private fun getNetworkCapabilities(
