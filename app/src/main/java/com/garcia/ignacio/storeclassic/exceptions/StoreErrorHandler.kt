@@ -1,8 +1,8 @@
 package com.garcia.ignacio.storeclassic.exceptions
 
 import android.app.Application
-import com.garcia.ignacio.storeclassic.BuildConfig
 import com.garcia.ignacio.storeclassic.R
+import com.garcia.ignacio.storeclassic.common.buildconfig.BuildConfig
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorHandler
 import com.garcia.ignacio.storeclassic.data.exceptions.ErrorType
 import com.garcia.ignacio.storeclassic.data.exceptions.ReportableError
