@@ -8,6 +8,7 @@ import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.data.local.DiscountsLocalDataStore
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
+import com.garcia.ignacio.storeclassic.domain.models.Discount
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
@@ -20,19 +21,24 @@ class DiscountsRepository @Inject constructor(
 ) {
     suspend fun updateDiscounts() {
         withContext(Dispatchers.IO) {
+            val errors = mutableListOf<Throwable>()
             storeClient.getDiscounts()
                 .mapError {
                     if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
                     else StoreException.DeviceOffline(it)
-                }.mapCatching {
-                    if (it.isNotEmpty()) localDataStore.updateDiscounts(it)
-                }.mapError { throwable ->
+                }.mapCatching { discounts ->
+                    val (unimplemented, valid) = discounts.partition { it is Discount.Unimplemented }
+                    unimplemented.forEach { errors.add(StoreException.UnimplementedDiscount(it)) }
+                    if (valid.isNotEmpty()) localDataStore.updateDiscounts(valid)
+                }.onFailure { throwable ->
                     when (throwable) {
                         is StoreException -> throwable
                         else -> stageException(Stage.DB_WRITE, throwable)
                     }.also {
-                        errorHandler.handleErrors(listOf(it))
+                        errors.add(it)
                     }
+                }.also {
+                    errorHandler.handleErrors(errors, ErrorType.DISCOUNT)
                 }
         }
     }

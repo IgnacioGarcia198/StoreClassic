@@ -31,7 +31,7 @@ class ProductsRepository @Inject constructor(
                         is StoreException -> throwable
                         else -> stageException(Stage.DB_WRITE, throwable)
                     }.also {
-                        errorHandler.handleErrors(listOf(it))
+                        errorHandler.handleErrors(listOf(it), ErrorType.PRODUCT)
                     }
                 }
         }
