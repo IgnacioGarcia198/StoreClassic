@@ -1,6 +1,8 @@
 package com.garcia.ignacio.storeclassic.network.di
 
 import android.app.Application
+import android.net.ConnectivityManager
+import androidx.core.content.ContextCompat
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.remote.StoreClient
 import com.garcia.ignacio.storeclassic.network.client.CabifyStoreClient
@@ -22,10 +24,16 @@ interface NetworkModule {
     @Singleton
     fun bindStoreClient(client: CabifyStoreClient): StoreClient
 
+    @Binds
+    fun bindConnectivityMonitor(monitor: StoreConnectivityMonitor): ConnectivityMonitor
+
     companion object {
         @Provides
-        fun provideConnectivityMonitor(application: Application): ConnectivityMonitor =
-            StoreConnectivityMonitor(application)
+        fun provideConnectivityManager(
+            application: Application
+        ): ConnectivityManager = ContextCompat.getSystemService(
+            application, ConnectivityManager::class.java
+        )!!
 
         @Provides
         fun provideHttpClientEngine(): HttpClientEngine = Android.create()

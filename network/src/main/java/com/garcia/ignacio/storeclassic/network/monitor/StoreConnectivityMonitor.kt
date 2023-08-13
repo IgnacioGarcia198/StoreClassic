@@ -1,10 +1,8 @@
 package com.garcia.ignacio.storeclassic.network.monitor
 
-import android.app.Application
 import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
-import androidx.core.content.ContextCompat
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,15 +17,10 @@ import javax.inject.Singleton
 
 @Singleton
 class StoreConnectivityMonitor @Inject constructor(
-    context: Application,
-    coroutineScope: CoroutineScope = CoroutineScope(Dispatchers.IO),
+    private val connectivityManager: ConnectivityManager,
 ) : ConnectivityMonitor {
 
-    private val connectivityManager: ConnectivityManager = ContextCompat.getSystemService(
-        context, ConnectivityManager::class.java
-    )!!
-
-    private val networkCallback = NetworkCallback()
+    private val networkCallback = getNetworkCallback()
 
     private val _currentNetwork = MutableStateFlow(provideDefaultCurrentNetwork())
 
@@ -35,9 +28,9 @@ class StoreConnectivityMonitor @Inject constructor(
         _currentNetwork
             .map { it.isConnected }
             .stateIn(
-                scope = coroutineScope,
+                scope = CoroutineScope(Dispatchers.IO),
                 started = SharingStarted.WhileSubscribed(),
-                initialValue = true
+                initialValue = _currentNetwork.value.isConnected
             )
 
     init {
@@ -75,7 +68,7 @@ class StoreConnectivityMonitor @Inject constructor(
         connectivityManager.unregisterNetworkCallback(networkCallback)
     }
 
-    private inner class NetworkCallback : ConnectivityManager.NetworkCallback() {
+    private fun getNetworkCallback() = object : ConnectivityManager.NetworkCallback() {
         override fun onAvailable(network: Network) {
             _currentNetwork.update {
                 it.copy(isAvailable = true)
