@@ -1,0 +1,13 @@
+plugins {
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.kotlin.android)
+}
+
+android {
+    namespace 'com.garcia.ignacio.storeclassic.androidtesting'
+}
+
+dependencies {
+    api libs.kotlinx.coroutines.test
+    implementation libs.junit
+}
