@@ -19,7 +19,8 @@ import org.junit.Test
 
 class StoreConnectivityMonitorTest {
     @get: Rule
-    val coroutineTestRule = CoroutineTestRule()
+    val coroutineTestRule =
+        CoroutineTestRule()
     private val networkCallbackSlot = slot<ConnectivityManager.NetworkCallback>()
     private val connectivityManager: ConnectivityManager = mockk(relaxed = true) {
         captureCallback()

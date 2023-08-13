@@ -19,7 +19,8 @@ import org.junit.Test
 @OptIn(ExperimentalCoroutinesApi::class)
 class StoreDataUpdaterTest {
     @get: Rule
-    val coroutineTestRule = CoroutineTestRule()
+    val coroutineTestRule =
+        CoroutineTestRule()
 
     private val discountsRepository: DiscountsRepository = mockk(relaxed = true)
     private val productsRepository: ProductsRepository = mockk(relaxed = true)
