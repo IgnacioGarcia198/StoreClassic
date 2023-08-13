@@ -8,6 +8,8 @@ import io.mockk.every
 import io.mockk.mockk
 import io.mockk.slot
 import junit.framework.TestCase.assertEquals
+import junit.framework.TestCase.assertFalse
+import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
@@ -117,6 +119,33 @@ class StoreConnectivityMonitorTest {
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }
         assertEquals(listOf(false, true, false), connectedStates)
+    }
+
+    @Test
+    fun `isNetworkConnected returns true when all conditions are met`() {
+        every { connectivityManager.getNetworkCapabilities(any()) }
+            .returns(goodNetworkCapabilities)
+
+
+        assertTrue(monitor.isNetworkConnected)
+    }
+
+    @Test
+    fun `isNetworkConnected returns false when connection has not all required capabilities`() {
+        every { connectivityManager.getNetworkCapabilities(any()) }
+            .returns(getNetworkCapabilities(hasValidatedCapability = false))
+
+
+        assertFalse(monitor.isNetworkConnected)
+    }
+
+    @Test
+    fun `isNetworkConnected returns false when connection has not a valid transport`() {
+        every { connectivityManager.getNetworkCapabilities(any()) }
+            .returns(getNetworkCapabilities(hasValidTransport = false))
+
+
+        assertFalse(monitor.isNetworkConnected)
     }
 
     private fun observeNetworkConnectedFlow() {
