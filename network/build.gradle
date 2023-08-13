@@ -19,6 +19,9 @@ dependencies {
     implementation libs.kotlinx.serialization.json
     implementation libs.jakewharton.timber
 
+    testImplementation project(":androidTesting")
     testImplementation libs.junit
     testImplementation libs.io.ktor.client.mock
+    testImplementation libs.androidx.test.ext.junit
+    testImplementation libs.io.mockk.mockk
 }
