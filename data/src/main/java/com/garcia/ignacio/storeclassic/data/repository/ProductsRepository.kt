@@ -24,9 +24,9 @@ class ProductsRepository @Inject constructor(
                 .mapError {
                     if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
                     else StoreException.DeviceOffline(it)
-                }.map {
+                }.mapCatching {
                     if (it.isNotEmpty()) localDataStore.updateProducts(it)
-                }.mapError { throwable ->
+                }.onFailure { throwable ->
                     when (throwable) {
                         is StoreException -> throwable
                         else -> stageException(Stage.DB_WRITE, throwable)
