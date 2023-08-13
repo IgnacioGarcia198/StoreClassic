@@ -24,7 +24,7 @@ class DiscountsRepository @Inject constructor(
                 .mapError {
                     if (connectivityMonitor.isNetworkConnected) stageException(Stage.CLIENT, it)
                     else StoreException.DeviceOffline(it)
-                }.map {
+                }.mapCatching {
                     if (it.isNotEmpty()) localDataStore.updateDiscounts(it)
                 }.mapError { throwable ->
                     when (throwable) {
