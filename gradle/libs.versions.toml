@@ -63,3 +63,4 @@ io-mockk-mockk = { module = "io.mockk:mockk", version.ref = "mockk" }
 io-mockk-android = { module = "io.mockk:mockk-android", version.ref = "mockk" }
 org-robolectric = { module = "org.robolectric:robolectric", version.ref = "robolectric" }
 io-ktor-client-mock = { module = "io.ktor:ktor-client-mock", version.ref = "ktor" }
+kotlinx-coroutines-test = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-test", version.ref = "kotlinxCoroutines" }
