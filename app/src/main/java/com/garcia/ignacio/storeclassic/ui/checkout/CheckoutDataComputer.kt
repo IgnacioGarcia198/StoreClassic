@@ -6,7 +6,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class CheckoutViewModelHelper @Inject constructor() {
+class CheckoutDataComputer @Inject constructor() {
 
     suspend fun computeCheckoutData(
         cart: List<Product>,

@@ -13,14 +13,14 @@ import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
 @HiltViewModel
 class CheckoutViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
-    private val helper: CheckoutViewModelHelper,
+    private val computer: CheckoutDataComputer,
     private val cart: MutableList<Product>,
 ) : ViewModel() {
 
@@ -41,8 +41,8 @@ class CheckoutViewModel @Inject constructor(
         cartFlow.flatMapLatest { cart ->
             discountedProductsRepository.findDiscountedProducts(
                 cart.map { it.code }.toSet()
-            ).map { list ->
-                helper.computeCheckoutData(cart, list).also {
+            ).onEach { list ->
+                computer.computeCheckoutData(cart, list).also {
                     checkoutState.value = ListState.Ready(it)
                 }
             }
