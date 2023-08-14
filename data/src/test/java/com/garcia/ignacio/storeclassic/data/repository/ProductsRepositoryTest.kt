@@ -136,8 +136,4 @@ class ProductsRepositoryTest {
             coVerify { storeClient.getProducts() }
             coVerify(exactly = 0) { localDataStore.updateProducts(any()) }
         }
-
-    private data class TestException(override val message: String = "test") : Throwable(message)
-
-
 }

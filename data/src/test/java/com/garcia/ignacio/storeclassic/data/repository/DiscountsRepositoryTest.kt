@@ -179,6 +179,4 @@ class DiscountsRepositoryTest {
             coVerify { storeClient.getDiscounts() }
             coVerify(exactly = 0) { localDataStore.updateDiscounts(any()) }
         }
-
-    private data class TestException(override val message: String = "test") : Throwable(message)
 }

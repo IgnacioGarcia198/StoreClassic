@@ -8,7 +8,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class DiscountedProductsRepository @Inject constructor(
@@ -23,10 +22,12 @@ class DiscountedProductsRepository @Inject constructor(
             productCodes
         ).catch {
             errorHandler.handleErrors(listOf(StoreException.ErrorRetrievingDiscountedProducts(it)))
+            emit(emptyList())
         }.flowOn(Dispatchers.IO)
 
     fun getAllProductsWithDiscountsIfAny(): Flow<List<DiscountedProduct>> =
         localDataStore.getAllProductsAndDiscountIfAny().catch {
             errorHandler.handleErrors(listOf(StoreException.ErrorRetrievingDiscountedProducts(it)))
+            emit(emptyList())
         }.flowOn(Dispatchers.IO)
 }

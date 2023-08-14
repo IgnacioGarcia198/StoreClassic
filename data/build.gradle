@@ -1,5 +1,4 @@
 plugins {
-    id 'java-library'
     alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
 }
@@ -12,4 +11,5 @@ dependencies {
 
     testImplementation libs.junit
     testImplementation libs.io.mockk.mockk
+    testImplementation libs.kotlinx.coroutines.test
 }
