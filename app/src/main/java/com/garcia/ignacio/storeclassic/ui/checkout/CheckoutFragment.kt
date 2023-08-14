@@ -8,7 +8,6 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
-import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
@@ -22,9 +21,6 @@ class CheckoutFragment : Fragment() {
 
     @Inject
     lateinit var adapter: CheckoutAdapter
-
-    @Inject
-    lateinit var formatter: StoreFormatter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
