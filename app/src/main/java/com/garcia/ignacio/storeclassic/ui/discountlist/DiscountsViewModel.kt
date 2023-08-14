@@ -8,9 +8,8 @@ import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsReposit
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -28,13 +27,8 @@ class DiscountsViewModel @Inject constructor(
     private fun initializeDiscountsForProduct(productCode: String?) {
         discountedProductsRepository.findDiscountedProducts(
             productCode?.let { setOf(productCode) } ?: emptySet()
-        ).map {
+        ).onEach {
             discountsState.value = ListState.Ready(it)
         }.launchIn(viewModelScope)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
     }
 }
