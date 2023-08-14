@@ -10,7 +10,6 @@ import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import com.garcia.ignacio.storeclassic.ui.model.ListState
-import com.garcia.ignacio.storeclassic.ui.model.toUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
@@ -20,6 +19,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
+    private val cart: MutableList<Product>,
 ) : ViewModel() {
     private val productsState = MutableLiveData<ListState<DiscountedProduct>>(ListState.Loading)
     fun getProductsState(): LiveData<ListState<DiscountedProduct>> = productsState
@@ -28,7 +28,6 @@ class ProductListViewModel @Inject constructor(
         private set
     private val productsEffect = MutableLiveData<Event<ProductsEffect>>(Event(ProductsEffect.Idle))
     fun getProductsEffect(): LiveData<Event<ProductsEffect>> = productsEffect
-    private val cart = mutableListOf<Product>()
 
     init {
         initializeAllProductsWithDiscountsIfAny()
@@ -57,7 +56,7 @@ class ProductListViewModel @Inject constructor(
     }
 
     fun goToCheckout() {
-        productsEffect.value = Event(ProductsEffect.Checkout(cart.map { it.toUi() }))
+        productsEffect.value = Event(ProductsEffect.Checkout)
     }
 
     private fun initializeAllProductsWithDiscountsIfAny() {

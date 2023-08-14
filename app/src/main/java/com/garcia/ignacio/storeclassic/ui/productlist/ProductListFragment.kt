@@ -19,7 +19,6 @@ import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentProductListBinding
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
-import com.garcia.ignacio.storeclassic.ui.checkout.CheckoutFragment
 import com.garcia.ignacio.storeclassic.ui.dialog.ConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.dialog.showConfirmationDialog
 import com.garcia.ignacio.storeclassic.ui.discountlist.DiscountsDialog
@@ -131,11 +130,8 @@ class ProductListFragment : Fragment() {
             is ProductsEffect.DisplayDiscounts ->
                 displayDiscountsForProduct(effect.product)
 
-            is ProductsEffect.Checkout ->
-                findNavController().navigate(
-                    R.id.action_ProductsFragment_to_CheckoutFragment,
-                    bundleOf(CheckoutFragment.ARG_CART to effect.products.toTypedArray())
-                )
+            ProductsEffect.Checkout ->
+                findNavController().navigate(R.id.action_ProductsFragment_to_CheckoutFragment)
         }
     }
 

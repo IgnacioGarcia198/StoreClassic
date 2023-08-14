@@ -7,11 +7,9 @@ import android.view.ViewGroup
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
-import com.garcia.ignacio.storeclassic.data.exceptions.StoreException
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
 import com.garcia.ignacio.storeclassic.ui.formatting.StoreFormatter
 import com.garcia.ignacio.storeclassic.ui.model.ListState
-import com.garcia.ignacio.storeclassic.ui.model.UiProduct
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -27,20 +25,6 @@ class CheckoutFragment : Fragment() {
 
     @Inject
     lateinit var formatter: StoreFormatter
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        initializeViewModel(savedInstanceState)
-    }
-
-    @Suppress("UNCHECKED_CAST")
-    private fun initializeViewModel(savedInstanceState: Bundle?) {
-        if (savedInstanceState == null) {
-            val cart = arguments?.getParcelableArray(ARG_CART) as? Array<UiProduct>
-                ?: throw StoreException.Misusing("Checkout needs a list of products")
-            viewModel.initialize(cart)
-        }
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -103,9 +87,5 @@ class CheckoutFragment : Fragment() {
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
-    }
-
-    companion object {
-        const val ARG_CART = "cart"
     }
 }

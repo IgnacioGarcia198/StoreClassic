@@ -30,9 +30,6 @@
         <action
             android:id="@+id/action_CheckoutFragment_to_discountsDialog"
             app:destination="@id/discountsDialog" />
-        <argument
-            android:name="cart"
-            app:argType="com.garcia.ignacio.storeclassic.ui.model.UiProduct[]" />
     </fragment>
     <dialog
         android:id="@+id/discountsDialog"

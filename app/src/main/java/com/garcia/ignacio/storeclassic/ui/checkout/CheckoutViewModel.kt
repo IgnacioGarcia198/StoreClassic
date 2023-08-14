@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.model.ListState
-import com.garcia.ignacio.storeclassic.ui.model.UiProduct
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.cancel
@@ -22,23 +21,24 @@ import javax.inject.Inject
 class CheckoutViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
     private val helper: CheckoutViewModelHelper,
+    private val cart: MutableList<Product>,
 ) : ViewModel() {
 
     private val checkoutState = MutableLiveData<ListState<CheckoutRow>>(ListState.Loading)
     fun getCheckoutState(): LiveData<ListState<CheckoutRow>> = checkoutState
-    private val cart = MutableStateFlow<List<Product>>(emptyList())
+    private val cartFlow = MutableStateFlow<List<Product>>(emptyList()).also { it.value = cart }
 
-    fun initialize(cart: Array<UiProduct>) {
-        this.cart.value = cart.map { it.toDomain() }
+    init {
         initializeCheckoutData()
     }
 
     fun clearCart() {
-        cart.value = emptyList()
+        cart.clear()
+        cartFlow.value = cart
     }
 
     private fun initializeCheckoutData() {
-        cart.flatMapLatest { cart ->
+        cartFlow.flatMapLatest { cart ->
             discountedProductsRepository.findDiscountedProducts(
                 cart.map { it.code }.toSet()
             ).map { list ->
