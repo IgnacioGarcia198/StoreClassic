@@ -11,9 +11,8 @@ import com.garcia.ignacio.storeclassic.ui.livedata.Event
 import com.garcia.ignacio.storeclassic.ui.model.AddToCart
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
 @HiltViewModel
@@ -60,13 +59,8 @@ class ProductListViewModel @Inject constructor(
     }
 
     private fun initializeAllProductsWithDiscountsIfAny() {
-        discountedProductsRepository.getAllProductsWithDiscountsIfAny().map {
+        discountedProductsRepository.getAllProductsWithDiscountsIfAny().onEach {
             productsState.value = ListState.Ready(it)
         }.launchIn(viewModelScope)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
     }
 }
