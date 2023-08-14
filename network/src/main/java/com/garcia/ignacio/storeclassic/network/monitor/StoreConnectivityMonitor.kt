@@ -4,7 +4,6 @@ import android.net.ConnectivityManager
 import android.net.Network
 import android.net.NetworkCapabilities
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
-import com.garcia.ignacio.storeclassic.testing.DefaultDispatcherProvider
 import com.garcia.ignacio.storeclassic.testing.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -19,7 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class StoreConnectivityMonitor @Inject constructor(
     private val connectivityManager: ConnectivityManager,
-    dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider()
+    dispatcherProvider: DispatcherProvider,
 ) : ConnectivityMonitor {
 
     private val networkCallback = getNetworkCallback()

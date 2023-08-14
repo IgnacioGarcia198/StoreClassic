@@ -1,10 +1,9 @@
 package com.garcia.ignacio.storeclassic.network.update
 
-import com.garcia.ignacio.storeclassic.testing.DefaultDispatcherProvider
-import com.garcia.ignacio.storeclassic.testing.DispatcherProvider
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository
+import com.garcia.ignacio.storeclassic.testing.DispatcherProvider
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -18,7 +17,7 @@ class StoreDataUpdater @Inject constructor(
     private val productsRepository: ProductsRepository,
     private val discountsRepository: DiscountsRepository,
     private val connectivityMonitor: ConnectivityMonitor,
-    dispatcherProvider: DispatcherProvider = DefaultDispatcherProvider(),
+    dispatcherProvider: DispatcherProvider,
 ) {
     private var wasConnected = true
     private val scope = CoroutineScope(dispatcherProvider.io())
