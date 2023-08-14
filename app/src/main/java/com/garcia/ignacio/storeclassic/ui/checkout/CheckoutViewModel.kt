@@ -26,7 +26,7 @@ class CheckoutViewModel @Inject constructor(
 
     private val checkoutState = MutableLiveData<ListState<CheckoutRow>>(ListState.Loading)
     fun getCheckoutState(): LiveData<ListState<CheckoutRow>> = checkoutState
-    private val cartFlow = MutableStateFlow<List<Product>>(emptyList()).also { it.value = cart }
+    private val cartFlow = MutableStateFlow(cart.toList())
 
     init {
         initializeCheckoutData()
@@ -34,7 +34,7 @@ class CheckoutViewModel @Inject constructor(
 
     fun clearCart() {
         cart.clear()
-        cartFlow.value = cart
+        cartFlow.value = emptyList()
     }
 
     private fun initializeCheckoutData() {
