@@ -1,6 +1,6 @@
 package com.garcia.ignacio.storeclassic.network.update
 
-import com.garcia.ignacio.storeclassic.androidtesting.CoroutineTestRule
+import com.garcia.ignacio.storeclassic.testing.CoroutineTestRule
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository

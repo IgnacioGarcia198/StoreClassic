@@ -1,14 +1,13 @@
 plugins {
-    alias(libs.plugins.android.library)
-    alias(libs.plugins.kotlin.android)
+    id 'java-library'
+    alias(libs.plugins.kotlin.jvm)
     alias(libs.plugins.kotlin.kapt)
+    id 'java-test-fixtures'
 }
 
-android {
-    namespace 'com.garcia.ignacio.storeclassic.androidtesting'
-
+sourceSets {
     testFixtures {
-        enable = true
+        java.srcDirs += ['src/testFixtures/java']
     }
 }
 

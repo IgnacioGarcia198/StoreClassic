@@ -1,7 +1,7 @@
 package com.garcia.ignacio.storeclassic.network.update
 
-import com.garcia.ignacio.storeclassic.androidtesting.DefaultDispatcherProvider
-import com.garcia.ignacio.storeclassic.androidtesting.DispatcherProvider
+import com.garcia.ignacio.storeclassic.testing.DefaultDispatcherProvider
+import com.garcia.ignacio.storeclassic.testing.DispatcherProvider
 import com.garcia.ignacio.storeclassic.data.remote.ConnectivityMonitor
 import com.garcia.ignacio.storeclassic.data.repository.DiscountsRepository
 import com.garcia.ignacio.storeclassic.data.repository.ProductsRepository

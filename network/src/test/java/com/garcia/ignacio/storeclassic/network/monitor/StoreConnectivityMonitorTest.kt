@@ -2,7 +2,7 @@ package com.garcia.ignacio.storeclassic.network.monitor
 
 import android.net.ConnectivityManager
 import android.net.NetworkCapabilities
-import com.garcia.ignacio.storeclassic.androidtesting.CoroutineTestRule
+import com.garcia.ignacio.storeclassic.testing.CoroutineTestRule
 import io.mockk.coVerify
 import io.mockk.every
 import io.mockk.mockk
@@ -11,14 +11,17 @@ import junit.framework.TestCase.assertEquals
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertTrue
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class StoreConnectivityMonitorTest {
     @get: Rule
     val coroutineTestRule =
@@ -27,7 +30,10 @@ class StoreConnectivityMonitorTest {
     private val connectivityManager: ConnectivityManager = mockk(relaxed = true) {
         captureCallback()
     }
-    private val monitor = StoreConnectivityMonitor(connectivityManager)
+    private val monitor = StoreConnectivityMonitor(
+        connectivityManager,
+        coroutineTestRule.testDispatcherProvider
+    )
 
     private val connectedStates = mutableListOf<Boolean>()
 
@@ -49,6 +55,7 @@ class StoreConnectivityMonitorTest {
         networkCallbackSlot.captured.onAvailable(mockk())
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), false)
         networkCallbackSlot.captured.onCapabilitiesChanged(mockk(), goodNetworkCapabilities)
+        advanceUntilIdle()
 
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }
@@ -60,7 +67,9 @@ class StoreConnectivityMonitorTest {
         networkCallbackSlot.captured.onAvailable(mockk())
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), false)
         networkCallbackSlot.captured.onCapabilitiesChanged(mockk(), goodNetworkCapabilities)
+        advanceUntilIdle()
         networkCallbackSlot.captured.onLost(mockk())
+        advanceUntilIdle()
 
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }
@@ -72,7 +81,9 @@ class StoreConnectivityMonitorTest {
         networkCallbackSlot.captured.onAvailable(mockk())
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), false)
         networkCallbackSlot.captured.onCapabilitiesChanged(mockk(), goodNetworkCapabilities)
+        advanceUntilIdle()
         networkCallbackSlot.captured.onUnavailable()
+        advanceUntilIdle()
 
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }
@@ -84,7 +95,9 @@ class StoreConnectivityMonitorTest {
         networkCallbackSlot.captured.onAvailable(mockk())
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), false)
         networkCallbackSlot.captured.onCapabilitiesChanged(mockk(), goodNetworkCapabilities)
+        advanceUntilIdle()
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), true)
+        advanceUntilIdle()
 
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }
@@ -96,10 +109,12 @@ class StoreConnectivityMonitorTest {
         networkCallbackSlot.captured.onAvailable(mockk())
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), false)
         networkCallbackSlot.captured.onCapabilitiesChanged(mockk(), goodNetworkCapabilities)
+        advanceUntilIdle()
         networkCallbackSlot.captured.onCapabilitiesChanged(
             mockk(),
             getNetworkCapabilities(hasValidatedCapability = false)
         )
+        advanceUntilIdle()
 
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }
@@ -111,10 +126,12 @@ class StoreConnectivityMonitorTest {
         networkCallbackSlot.captured.onAvailable(mockk())
         networkCallbackSlot.captured.onBlockedStatusChanged(mockk(), false)
         networkCallbackSlot.captured.onCapabilitiesChanged(mockk(), goodNetworkCapabilities)
+        advanceUntilIdle()
         networkCallbackSlot.captured.onCapabilitiesChanged(
             mockk(),
             getNetworkCapabilities(hasValidTransport = false)
         )
+        advanceUntilIdle()
 
 
         coVerify { connectivityManager.registerDefaultNetworkCallback(any()) }

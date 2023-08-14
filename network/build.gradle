@@ -12,7 +12,7 @@ android {
 
 dependencies {
     implementation project(":data")
-    implementation project(":androidTesting")
+    implementation project(':testing')
     implementation libs.io.ktor.client.android
     implementation libs.io.ktor.client.logging
     implementation libs.dagger.hilt.android
@@ -20,11 +20,11 @@ dependencies {
     implementation libs.kotlinx.serialization.json
     implementation libs.jakewharton.timber
 
-    testImplementation(testFixtures(project(":androidTesting")))
+    testImplementation(testFixtures(project(":testing")))
 
     testImplementation libs.junit
     testImplementation libs.io.ktor.client.mock
     testImplementation libs.androidx.test.ext.junit
     testImplementation libs.io.mockk.mockk
-    implementation libs.kotlinx.coroutines.test
+    testImplementation libs.kotlinx.coroutines.test
 }
