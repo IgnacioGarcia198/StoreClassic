@@ -154,6 +154,7 @@ class ProductListFragment : Fragment() {
         )
         val feedbackHtml = HtmlCompat.fromHtml(feedbackText, HtmlCompat.FROM_HTML_MODE_COMPACT)
         Snackbar.make(requireView(), feedbackHtml, Snackbar.LENGTH_SHORT)
+            .setAnchorView(binding.checkoutFab)
             .setTextColor(ContextCompat.getColor(requireContext(), R.color.white))
             .setBackgroundTint(
                 ContextCompat.getColor(

@@ -64,6 +64,7 @@ class MainActivity : AppCompatActivity() {
 
             AppEffect.ConnectionLost ->
                 showConnectionLostFeedback()
+
             AppEffect.Idle -> {}
         }
     }
@@ -72,6 +73,7 @@ class MainActivity : AppCompatActivity() {
         val feedbackText = getString(R.string.connection_lost_feedback)
         Snackbar.make(binding.root, feedbackText, Snackbar.LENGTH_SHORT)
             .setTextColor(ContextCompat.getColor(this, R.color.white))
+            .setAnchorView(R.id.checkoutFab)
             .setTextMaxLines(ERROR_FEEDBACK_MAX_LINES)
             .setBackgroundTint(
                 ContextCompat.getColor(
@@ -85,6 +87,7 @@ class MainActivity : AppCompatActivity() {
         val feedbackText = getString(R.string.connection_restored_feedback)
         Snackbar.make(binding.root, feedbackText, Snackbar.LENGTH_SHORT)
             .setTextColor(ContextCompat.getColor(this, R.color.white))
+            .setAnchorView(R.id.checkoutFab)
             .setBackgroundTint(
                 ContextCompat.getColor(
                     this,
@@ -107,6 +110,8 @@ class MainActivity : AppCompatActivity() {
             )
         ).setTextColor(
             ContextCompat.getColor(this, R.color.white)
+        ).setAnchorView(
+            R.id.checkoutFab
         ).setBackgroundTint(
             ContextCompat.getColor(
                 this,
