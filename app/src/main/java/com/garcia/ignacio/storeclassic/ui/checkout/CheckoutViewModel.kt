@@ -9,10 +9,11 @@ import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import javax.inject.Inject
 
@@ -39,18 +40,19 @@ class CheckoutViewModel @Inject constructor(
 
     private fun initializeCheckoutData() {
         cartFlow.flatMapLatest { cart ->
-            discountedProductsRepository.findDiscountedProducts(
-                cart.map { it.code }.toSet()
-            ).onEach { list ->
-                computer.computeCheckoutData(cart, list).also {
-                    checkoutState.value = ListState.Ready(it)
+            when {
+                cart.isNotEmpty() -> {
+                    discountedProductsRepository.findDiscountedProducts(
+                        cart.map { it.code }.toSet()
+                    ).map { list ->
+                        computer.computeCheckoutData(cart, list)
+                    }
                 }
+
+                else -> flowOf(emptyList())
+            }.onEach {
+                checkoutState.value = ListState.Ready(it)
             }
         }.launchIn(viewModelScope)
-    }
-
-    override fun onCleared() {
-        super.onCleared()
-        viewModelScope.cancel()
     }
 }
