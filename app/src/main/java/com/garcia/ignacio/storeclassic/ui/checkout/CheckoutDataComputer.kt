@@ -33,7 +33,7 @@ class CheckoutDataComputer @Inject constructor() {
                 val discountedAmount = discount.apply(applicable)
                 val discountedPercent = (1 - discountedAmount / applicable.sumOf { it.price }) * 100
                 discountedRows.add(
-                    DiscountedCheckoutRow(applicable, discount, discountedAmount, discountedPercent)
+                    DiscountedCheckoutRow(applicable, discountedAmount, discountedPercent)
                 )
             }
             if (nonApplicable.isNotEmpty()) {

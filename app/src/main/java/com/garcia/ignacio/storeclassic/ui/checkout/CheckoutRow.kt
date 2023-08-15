@@ -1,6 +1,5 @@
 package com.garcia.ignacio.storeclassic.ui.checkout
 
-import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.Product
 
 sealed interface CheckoutRow {
@@ -11,7 +10,6 @@ sealed interface CheckoutRow {
 
 data class DiscountedCheckoutRow(
     override val products: List<Product>,
-    val discount: Discount,
     override val amount: Double,
     override val discountedPercent: Double,
 ) : CheckoutRow
