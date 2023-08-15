@@ -3,6 +3,7 @@ package com.garcia.ignacio.storeclassic.ui.livedata
 /**
  * Used as a wrapper for data that is exposed via a LiveData/StateFlow that represents an event.
  */
+@Suppress("unused")
 data class Event<out T>(private val content: T) {
 
     var hasBeenHandled = false

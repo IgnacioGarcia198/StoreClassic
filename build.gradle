@@ -14,18 +14,6 @@ plugins {
     alias(libs.plugins.kotlin.parcelize) apply false
 }
 
-ext {
-    versions = [
-            'androidxCore' : '1.8.0',
-            'appcompat' : '1.6.1',
-            'material' : '1.9.0',
-
-            'junit' : '4.13.2',
-            'androidxJunit' : '1.1.5',
-            'espresso' : '3.5.1',
-    ]
-}
-
 def javaVersion = JavaVersion.VERSION_11
 def jvmTargetVersion = JvmTarget.JVM_11
 

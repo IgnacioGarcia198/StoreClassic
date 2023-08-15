@@ -14,6 +14,7 @@ private const val PRODUCTS_BOUGHT = 2
 private const val PRODUCTS_PAID = 1
 private const val MINIMUM_BOUGHT = 3
 private const val DISCOUNT_PERCENT = 5.0
+private const val DELTA = 0.0001
 
 class CheckoutDataComputerTest {
     private val voucher = Product(ProductCode.VOUCHER.name, PRODUCT_NAME, PRODUCT_PRICE)
@@ -51,8 +52,8 @@ class CheckoutDataComputerTest {
 
         assertEquals(2, result.size)
         val tShirtRow = result.first() as DiscountedCheckoutRow
-        assertEquals(PRODUCT_PRICE * 3 * 0.95, tShirtRow.amount)
-        assertEquals(5.0, tShirtRow.discountedPercent)
+        assertEquals(PRODUCT_PRICE * 3 * 0.95, tShirtRow.amount, DELTA)
+        assertEquals(5.0, tShirtRow.discountedPercent, DELTA)
     }
 
     @Test
@@ -80,10 +81,10 @@ class CheckoutDataComputerTest {
 
             assertEquals(3, result.size)
             val discountedRow = result.first() as DiscountedCheckoutRow
-            assertEquals(PRODUCT_PRICE * 2 * 0.5, discountedRow.amount)
-            assertEquals(50.0, discountedRow.discountedPercent)
+            assertEquals(PRODUCT_PRICE * 2 * 0.5, discountedRow.amount, DELTA)
+            assertEquals(50.0, discountedRow.discountedPercent, DELTA)
             val nonDiscountedRow = result[1] as NonDiscountedCheckoutRow
-            assertEquals(PRODUCT_PRICE, nonDiscountedRow.amount)
+            assertEquals(PRODUCT_PRICE, nonDiscountedRow.amount, DELTA)
         }
 
     @Test
@@ -96,13 +97,21 @@ class CheckoutDataComputerTest {
 
         assertEquals(4, result.size)
         val discountedVoucherRow = result.first() as DiscountedCheckoutRow
-        assertEquals(PRODUCT_PRICE * 2 * 0.5, discountedVoucherRow.amount)
+        assertEquals(PRODUCT_PRICE * 2 * 0.5, discountedVoucherRow.amount, DELTA)
         val nonDiscountedVoucherRow = result[1] as NonDiscountedCheckoutRow
         assertEquals(PRODUCT_PRICE, nonDiscountedVoucherRow.amount)
         val mugRow = result[2] as NonDiscountedCheckoutRow
         assertEquals(PRODUCT_PRICE, mugRow.amount)
         val totalRow = result[3] as TotalCheckoutRow
-        assertEquals(PRODUCT_PRICE * 2 + PRODUCT_PRICE * 2 * 0.5, totalRow.amount)
-        assertEquals((1 - totalRow.amount / (PRODUCT_PRICE * 4)) * 100, totalRow.discountedPercent)
+        assertEquals(
+            PRODUCT_PRICE * 2 + PRODUCT_PRICE * 2 * 0.5,
+            totalRow.amount,
+            DELTA
+        )
+        assertEquals(
+            (1 - totalRow.amount / (PRODUCT_PRICE * 4)) * 100,
+            totalRow.discountedPercent,
+            DELTA
+        )
     }
 }

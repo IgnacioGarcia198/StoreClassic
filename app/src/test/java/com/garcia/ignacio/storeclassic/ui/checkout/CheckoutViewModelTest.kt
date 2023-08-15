@@ -39,7 +39,6 @@ class CheckoutViewModelTest {
     private val states = mutableListOf<ListState<CheckoutRow>>()
     private val testCheckoutRow = DiscountedCheckoutRow(
         listOf(testProduct),
-        testDiscount,
         0.0,
         0.0
     )

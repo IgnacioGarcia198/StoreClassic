@@ -7,6 +7,14 @@ plugins {
 
 android {
     namespace 'com.garcia.ignacio.storeclassic.db'
+
+    defaultConfig {
+        javaCompileOptions {
+            annotationProcessorOptions {
+                arguments += ["room.schemaLocation": "$projectDir/schemas".toString()]
+            }
+        }
+    }
 }
 
 dependencies {

@@ -14,7 +14,6 @@ import javax.inject.Singleton
 
 private const val DATABASE_NAME = "storeDb.db"
 
-@Suppress("unused")
 @Module
 @InstallIn(SingletonComponent::class)
 class DatabaseModule {
