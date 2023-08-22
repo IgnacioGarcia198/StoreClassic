@@ -5,7 +5,6 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
-import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.model.ListState
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -22,8 +21,8 @@ import javax.inject.Inject
 class CheckoutViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
     private val computer: CheckoutDataComputer,
-    private val cart: MutableList<Product>,
 ) : ViewModel() {
+    private val cart get() = discountedProductsRepository.cart
 
     private val checkoutState = MutableLiveData<ListState<CheckoutRow>>(ListState.Loading)
     fun getCheckoutState(): LiveData<ListState<CheckoutRow>> = checkoutState

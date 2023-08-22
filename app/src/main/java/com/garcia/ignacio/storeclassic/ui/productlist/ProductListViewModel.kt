@@ -18,8 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductListViewModel @Inject constructor(
     private val discountedProductsRepository: DiscountedProductsRepository,
-    private val cart: MutableList<Product>,
 ) : ViewModel() {
+    private val cart get() = discountedProductsRepository.cart
+
     private val productsState = MutableLiveData<ListState<DiscountedProduct>>(ListState.Loading)
     fun getProductsState(): LiveData<ListState<DiscountedProduct>> = productsState
 
