@@ -1,5 +1,6 @@
 package com.garcia.ignacio.storeclassic.ui.checkout
 
+import com.garcia.ignacio.storeclassic.domain.models.Discount
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import kotlinx.coroutines.Dispatchers
@@ -15,11 +16,10 @@ class CheckoutDataComputer @Inject constructor() {
         val discountedRows = mutableListOf<CheckoutRow>()
         val nonDiscountedRows = mutableListOf<CheckoutRow>()
         cart.groupBy { product -> product.code }.forEach { (productCode, productGroup) ->
-            val discount = discountedProducts.map {
-                it.discount
-            }.find {
-                it?.productCode == productCode
-            } ?: let {
+            val discount = findDiscountForProduct(
+                discountedProducts,
+                productCode,
+            ) ?: let {
                 nonDiscountedRows.add(
                     NonDiscountedCheckoutRow(
                         productGroup,
@@ -28,22 +28,22 @@ class CheckoutDataComputer @Inject constructor() {
                 )
                 return@forEach
             }
-            val (applicable, nonApplicable) = discount.partitionApplicableProducts(productGroup)
-            if (applicable.isNotEmpty()) {
-                val discountedAmount = discount.apply(applicable)
-                val discountedPercent = (1 - discountedAmount / applicable.sumOf { it.price }) * 100
-                discountedRows.add(
-                    DiscountedCheckoutRow(applicable, discountedAmount, discountedPercent)
-                )
-            }
-            if (nonApplicable.isNotEmpty()) {
-                nonDiscountedRows.add(
-                    NonDiscountedCheckoutRow(nonApplicable, nonApplicable.sumOf { it.price })
-                )
-            }
+            partitionDiscountedProductGroup(
+                discount,
+                productGroup,
+                discountedRows,
+                nonDiscountedRows
+            )
         }
         val checkoutRows = discountedRows + nonDiscountedRows
-        return@withContext if (checkoutRows.isEmpty()) checkoutRows
+        return@withContext addTotalRowIfNeeded(checkoutRows, cart)
+    }
+
+    private fun addTotalRowIfNeeded(
+        checkoutRows: List<CheckoutRow>,
+        cart: List<Product>
+    ): List<CheckoutRow> {
+        return if (checkoutRows.isEmpty()) checkoutRows
         else {
             val totalAmount = checkoutRows.sumOf { it.amount }
             val originalAmount = cart.sumOf { it.price }
@@ -54,5 +54,35 @@ class CheckoutDataComputer @Inject constructor() {
             )
             checkoutRows + totalRow
         }
+    }
+
+    private fun partitionDiscountedProductGroup(
+        discount: Discount,
+        productGroup: List<Product>,
+        discountedRows: MutableList<CheckoutRow>,
+        nonDiscountedRows: MutableList<CheckoutRow>
+    ) {
+        val (applicable, nonApplicable) = discount.partitionApplicableProducts(productGroup)
+        if (applicable.isNotEmpty()) {
+            val discountedAmount = discount.apply(applicable)
+            val discountedPercent = (1 - discountedAmount / applicable.sumOf { it.price }) * 100
+            discountedRows.add(
+                DiscountedCheckoutRow(applicable, discountedAmount, discountedPercent)
+            )
+        }
+        if (nonApplicable.isNotEmpty()) {
+            nonDiscountedRows.add(
+                NonDiscountedCheckoutRow(nonApplicable, nonApplicable.sumOf { it.price })
+            )
+        }
+    }
+
+    private fun findDiscountForProduct(
+        discountedProducts: List<DiscountedProduct>,
+        productCode: String,
+    ): Discount? = discountedProducts.map {
+        it.discount
+    }.find {
+        it?.productCode == productCode
     }
 }
