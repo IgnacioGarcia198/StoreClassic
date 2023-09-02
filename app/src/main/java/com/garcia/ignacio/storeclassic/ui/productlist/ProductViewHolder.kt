@@ -12,7 +12,7 @@ private const val ADD_TO_CART_AT_ONCE_LIMIT = 10
 
 class ProductViewHolder(
     private val binding: ProductListItemBinding,
-    private val viewModel: ProductListViewModel,
+    private val actions: ProductItemActions,
     private val formatter: StoreFormatter,
 ) : RecyclerView.ViewHolder(binding.root) {
 
@@ -32,7 +32,7 @@ class ProductViewHolder(
             if (product.discount != null) View.VISIBLE
             else View.INVISIBLE
         binding.seeDiscounts.setOnClickListener {
-            viewModel.displayDiscounts(product.product)
+            actions.seeDiscounts(product.product)
         }
         binding.addToCart.setSelection(binding.addToCart.selectedItemPosition, false)
         binding.addToCart.onItemSelectedListener = object : AdapterView.OnItemSelectedListener {
@@ -42,7 +42,7 @@ class ProductViewHolder(
                 position: Int,
                 id: Long
             ) {
-                viewModel.pendingAddToCart(product.product, position + 1)
+                actions.productQuantitySelected(product.product, position + 1)
             }
 
             override fun onNothingSelected(parent: AdapterView<*>?) {

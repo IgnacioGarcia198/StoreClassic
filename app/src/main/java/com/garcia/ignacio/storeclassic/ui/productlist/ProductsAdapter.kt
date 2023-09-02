@@ -13,10 +13,10 @@ class ProductsAdapter @Inject constructor(
     private val formatter: StoreFormatter,
 ) : ListAdapter<DiscountedProduct, ProductViewHolder>(ProductDiffCallback()) {
 
-    lateinit var viewModel: ProductListViewModel
+    lateinit var actions: ProductItemActions
 
-    fun initialize(viewModel: ProductListViewModel) {
-        this.viewModel = viewModel
+    fun initialize(actions: ProductItemActions) {
+        this.actions = actions
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ProductViewHolder {
@@ -25,7 +25,7 @@ class ProductsAdapter @Inject constructor(
         )
         return ProductViewHolder(
             binding,
-            viewModel,
+            actions,
             formatter
         )
     }

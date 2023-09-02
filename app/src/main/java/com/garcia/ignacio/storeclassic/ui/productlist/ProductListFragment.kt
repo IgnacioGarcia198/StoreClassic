@@ -187,7 +187,17 @@ class ProductListFragment : Fragment() {
 
     private fun initializeRecyclerView() {
         binding.productList.adapter = productsAdapter.also {
-            it.initialize(viewModel)
+            it.initialize(productItemActions)
+        }
+    }
+
+    private val productItemActions = object : ProductItemActions {
+        override fun productQuantitySelected(product: Product, quantity: Int) {
+            viewModel.pendingAddToCart(product, quantity)
+        }
+
+        override fun seeDiscounts(product: Product) {
+            viewModel.displayDiscounts(product)
         }
     }
 
