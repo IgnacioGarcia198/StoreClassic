@@ -11,8 +11,8 @@ import androidx.fragment.app.DialogFragment
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.R
 import com.garcia.ignacio.storeclassic.databinding.DialogDiscountsBinding
-import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.ui.model.ListState
+import com.garcia.ignacio.storeclassic.ui.model.UiDiscountedProduct
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -34,7 +34,7 @@ class DiscountsDialog : DialogFragment() {
 
     private fun initializeViewModel(savedInstanceState: Bundle?) {
         if (savedInstanceState == null) {
-            viewModel.initialize(productCode)
+            viewModel.initialize(productCode, requireContext())
         }
     }
 
@@ -79,7 +79,7 @@ class DiscountsDialog : DialogFragment() {
         }
     }
 
-    private fun renderState(state: ListState<DiscountedProduct>) {
+    private fun renderState(state: ListState<UiDiscountedProduct>) {
         when (state) {
             ListState.Loading -> {
                 showLoading()
@@ -100,7 +100,7 @@ class DiscountsDialog : DialogFragment() {
         binding.loading.show()
     }
 
-    private fun renderDiscounts(list: List<DiscountedProduct>) {
+    private fun renderDiscounts(list: List<UiDiscountedProduct>) {
         discountsAdapter.submitList(list)
         val emptyDiscounts = list.isEmpty()
         binding.noDiscountsText.isVisible = emptyDiscounts
