@@ -9,6 +9,7 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.garcia.ignacio.storeclassic.databinding.FragmentCheckoutBinding
 import com.garcia.ignacio.storeclassic.ui.model.ListState
+import com.garcia.ignacio.storeclassic.ui.model.UiCheckoutRow
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 
@@ -46,7 +47,7 @@ class CheckoutFragment : Fragment() {
         }
     }
 
-    private fun renderState(state: ListState<CheckoutRow>) {
+    private fun renderState(state: ListState<UiCheckoutRow>) {
         when (state) {
             ListState.Loading -> {
                 showLoading()
@@ -67,7 +68,7 @@ class CheckoutFragment : Fragment() {
         binding.loading.show()
     }
 
-    private fun renderCheckoutData(checkoutData: List<CheckoutRow>) {
+    private fun renderCheckoutData(checkoutData: List<UiCheckoutRow>) {
         val emptyCart = checkoutData.isEmpty()
         binding.checkoutGroup.isVisible = !emptyCart
         binding.emptyCartText.isVisible = emptyCart

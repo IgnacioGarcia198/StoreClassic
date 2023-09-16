@@ -5,8 +5,11 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
+import com.garcia.ignacio.storeclassic.domain.checkout.CheckoutDataComputer
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.model.ListState
+import com.garcia.ignacio.storeclassic.ui.model.UiCheckoutRow
+import com.garcia.ignacio.storeclassic.ui.model.toUi
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -25,8 +28,8 @@ class CheckoutViewModel @Inject constructor(
     private val cart: MutableList<Product>,
 ) : ViewModel() {
 
-    private val checkoutState = MutableLiveData<ListState<CheckoutRow>>(ListState.Loading)
-    fun getCheckoutState(): LiveData<ListState<CheckoutRow>> = checkoutState
+    private val checkoutState = MutableLiveData<ListState<UiCheckoutRow>>(ListState.Loading)
+    fun getCheckoutState(): LiveData<ListState<UiCheckoutRow>> = checkoutState
     private val cartFlow = MutableStateFlow(cart.toList())
 
     init {
@@ -51,7 +54,7 @@ class CheckoutViewModel @Inject constructor(
 
                 else -> flowOf(emptyList())
             }.onEach {
-                checkoutState.value = ListState.Ready(it)
+                checkoutState.value = ListState.Ready(it.map { list -> list.toUi() })
             }
         }.launchIn(viewModelScope)
     }

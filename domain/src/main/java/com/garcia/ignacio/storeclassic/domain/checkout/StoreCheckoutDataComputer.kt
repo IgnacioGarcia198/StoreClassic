@@ -1,15 +1,19 @@
-package com.garcia.ignacio.storeclassic.ui.checkout
+package com.garcia.ignacio.storeclassic.domain.checkout
 
+import com.garcia.ignacio.storeclassic.domain.models.CheckoutRow
 import com.garcia.ignacio.storeclassic.domain.models.Discount
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
+import com.garcia.ignacio.storeclassic.domain.models.NonDiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.domain.models.Product
+import com.garcia.ignacio.storeclassic.domain.models.TotalCheckoutRow
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-class CheckoutDataComputer @Inject constructor() {
+class StoreCheckoutDataComputer @Inject constructor() : CheckoutDataComputer {
 
-    suspend fun computeCheckoutData(
+    override suspend fun computeCheckoutData(
         cart: List<Product>,
         discountedProducts: List<DiscountedProduct>,
     ): List<CheckoutRow> = withContext(Dispatchers.Default) {

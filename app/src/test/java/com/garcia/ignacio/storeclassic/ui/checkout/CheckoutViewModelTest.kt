@@ -1,30 +1,43 @@
 package com.garcia.ignacio.storeclassic.ui.checkout
 
-import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.arch.core.executor.testing.InstantTaskExecutorRule
 import com.garcia.ignacio.storeclassic.data.repository.DiscountedProductsRepository
+import com.garcia.ignacio.storeclassic.domain.checkout.CheckoutDataComputer
 import com.garcia.ignacio.storeclassic.domain.models.Discount
+import com.garcia.ignacio.storeclassic.domain.models.DiscountedCheckoutRow
 import com.garcia.ignacio.storeclassic.domain.models.DiscountedProduct
 import com.garcia.ignacio.storeclassic.domain.models.Product
 import com.garcia.ignacio.storeclassic.ui.model.ListState
+import com.garcia.ignacio.storeclassic.ui.model.UiCheckoutRow
+import com.garcia.ignacio.storeclassic.ui.model.toUi
 import io.mockk.called
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.mockk
 import junit.framework.TestCase.assertEquals
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.resetMain
+import kotlinx.coroutines.test.setMain
+import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
-import org.junit.runner.RunWith
 
 private const val PRODUCT_CODE = "code"
 private const val PRODUCT_NAME = "name"
 private const val PRODUCT_PRICE = 10.0
 
-@RunWith(AndroidJUnit4::class)
+@OptIn(ExperimentalCoroutinesApi::class)
 class CheckoutViewModelTest {
+    @get:Rule
+    val rule = InstantTaskExecutorRule()
+
     private val testProduct = Product(PRODUCT_CODE, PRODUCT_NAME, PRODUCT_PRICE)
     private val testDiscount = Discount.XForY(PRODUCT_CODE, 2, 3)
     private val discountedProducts = listOf(DiscountedProduct(testProduct, testDiscount))
@@ -35,8 +48,8 @@ class CheckoutViewModelTest {
     }
     private val computer: CheckoutDataComputer = mockk()
     private val cart = mutableListOf(testProduct)
-    private val viewModel = CheckoutViewModel(repository, computer, cart)
-    private val states = mutableListOf<ListState<CheckoutRow>>()
+    private lateinit var viewModel: CheckoutViewModel
+    private val states = mutableListOf<ListState<UiCheckoutRow>>()
     private val testCheckoutRow = DiscountedCheckoutRow(
         listOf(testProduct),
         0.0,
@@ -45,10 +58,17 @@ class CheckoutViewModelTest {
 
     @Before
     fun setUp() {
+        Dispatchers.setMain(UnconfinedTestDispatcher())
         coEvery { computer.computeCheckoutData(any(), any()) }
             .returns(listOf(testCheckoutRow))
         states.clear()
+        viewModel = CheckoutViewModel(repository, computer, cart)
         observeViewModel()
+    }
+
+    @After
+    fun tearDown() {
+        Dispatchers.resetMain()
     }
 
     @Test
@@ -75,7 +95,7 @@ class CheckoutViewModelTest {
         discountedProductsChannel.send(discountedProducts)
 
 
-        verifyStates(ListState.Loading, ListState.Ready(listOf(testCheckoutRow)))
+        verifyStates(ListState.Loading, ListState.Ready(listOf(testCheckoutRow.toUi())))
     }
 
     @Test
@@ -97,7 +117,7 @@ class CheckoutViewModelTest {
         }
     }
 
-    private fun verifyStates(vararg testStates: ListState<CheckoutRow>) {
+    private fun verifyStates(vararg testStates: ListState<UiCheckoutRow>) {
         assertEquals(testStates.toList(), states)
     }
 }

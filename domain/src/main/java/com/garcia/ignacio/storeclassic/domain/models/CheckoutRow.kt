@@ -1,6 +1,4 @@
-package com.garcia.ignacio.storeclassic.ui.checkout
-
-import com.garcia.ignacio.storeclassic.domain.models.Product
+package com.garcia.ignacio.storeclassic.domain.models
 
 sealed interface CheckoutRow {
     val products: List<Product>
